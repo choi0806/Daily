@@ -1,0 +1,32 @@
+.app {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.main-content {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.calendar-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.leaderboard-section {
+  width: 400px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    flex-direction: column;
+  }
+
+  .leaderboard-section {
+    width: 100%;
+  }
+}
