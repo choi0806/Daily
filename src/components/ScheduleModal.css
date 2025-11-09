@@ -63,7 +63,7 @@
 .schedule-modal-header h2 svg {
   width: 28px;
   height: 28px;
-  color: #667eea;
+  color: #ff6b35;
 }
 
 .close-btn {
@@ -97,7 +97,7 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   border-radius: 12px;
   color: white;
   font-size: 16px;
@@ -139,7 +139,7 @@
 .form-group input[type="time"]:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #ff6b35;
 }
 
 .form-group textarea {
@@ -245,7 +245,7 @@
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
 }
 
@@ -254,7 +254,7 @@
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-/* 스크롤바 스타일 */
+/* ?�크롤바 ?��???*/
 .schedule-modal::-webkit-scrollbar {
   width: 8px;
 }

@@ -52,7 +52,7 @@
 }
 
 .view-mode-tab.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
@@ -154,7 +154,7 @@
 }
 
 .calendar-day:hover {
-  border-color: #667eea;
+  border-color: #ff6b35;
   background-color: #f8f9ff;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -172,8 +172,8 @@
 }
 
 .calendar-day.today {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-color: #ff6b35;
+  background: linear-gradient(135deg, #ff6b3515 0%, #f7931e15 100%);
 }
 
 .day-number {
@@ -200,14 +200,14 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   border: 2px solid white;
 }
 
 .avatar-count {
   font-size: 11px;
   font-weight: 600;
-  color: #667eea;
+  color: #ff6b35;
   margin-left: 2px;
 }
 
@@ -230,10 +230,10 @@
 .schedule-count {
   font-size: 11px;
   font-weight: 700;
-  color: #667eea;
+  color: #ff6b35;
 }
 
-/* INT-002: Tomorrow 표시 */
+/* INT-002: Tomorrow ?�시 */
 .tomorrow-indicator {
   display: flex;
   align-items: center;

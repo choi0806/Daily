@@ -9,9 +9,39 @@
   text-align: center;
 }
 
+.admin-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-close-btn {
+  background: rgba(227, 25, 55, 0.1);
+  border: 2px solid #f7931e;
+  color: #f7931e;
+  font-size: 1.5rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.admin-close-btn:hover {
+  background: #f7931e;
+  color: white;
+  transform: rotate(90deg);
+}
+
 .admin-header h1 {
   font-size: 2.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -28,6 +58,8 @@
   gap: 10px;
   margin-bottom: 30px;
   border-bottom: 2px solid #e2e8f0;
+  flex-wrap: wrap;
+  overflow-x: auto;
 }
 
 .tab-btn {
@@ -40,15 +72,18 @@
   cursor: pointer;
   border-bottom: 3px solid transparent;
   transition: all 0.3s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tab-btn:hover {
-  color: #667eea;
+  color: #ff6b35;
 }
 
 .tab-btn.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
+  color: #ff6b35;
+  border-bottom-color: #ff6b35;
 }
 
 .admin-content {
@@ -58,7 +93,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* 채점 기준 설정 */
+/* 채점 기�? ?�정 */
 .scoring-settings h2,
 .team-settings h2,
 .api-settings h2 {
@@ -93,7 +128,7 @@
 .weight-fill {
   height: 100%;
   transition: all 0.3s;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #ff6b35 0%, #f7931e 100%);
 }
 
 .total-weight-indicator span {
@@ -127,7 +162,7 @@
 }
 
 .criteria-item:hover {
-  border-color: #667eea;
+  border-color: #ff6b35;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
 }
 
@@ -140,7 +175,7 @@
 
 .criteria-header h3 {
   font-size: 1.2rem;
-  color: #667eea;
+  color: #ff6b35;
   font-weight: 700;
 }
 
@@ -180,11 +215,11 @@
 
 .criteria-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #ff6b35 0%, #f7931e 100%);
   transition: width 0.3s;
 }
 
-/* 팀 구성 관리 */
+/* ?�?구성 관�?*/
 .team-info-section {
   margin-bottom: 40px;
   padding: 25px;
@@ -225,7 +260,7 @@
 
 .input-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #ff6b35;
 }
 
 .team-members-section h3 {
@@ -243,7 +278,7 @@
 
 .add-member-btn {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -275,7 +310,7 @@
 }
 
 .member-card:hover {
-  border-color: #667eea;
+  border-color: #ff6b35;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
 }
 
@@ -295,7 +330,7 @@
 
 .member-inputs input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #ff6b35;
 }
 
 .name-input {
@@ -326,7 +361,7 @@
   transform: scale(1.1);
 }
 
-/* API 키 관리 */
+/* API ??관�?*/
 .api-key-section {
   display: flex;
   flex-direction: column;
@@ -357,14 +392,14 @@
 }
 
 .provider-info a {
-  color: #667eea;
+  color: #ff6b35;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s;
 }
 
 .provider-info a:hover {
-  color: #764ba2;
+  color: #f7931e;
 }
 
 .api-input-group {
@@ -385,7 +420,7 @@
 
 .api-key-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #ff6b35;
 }
 
 .toggle-visibility-btn {
@@ -399,13 +434,13 @@
 }
 
 .toggle-visibility-btn:hover {
-  border-color: #667eea;
+  border-color: #ff6b35;
   transform: scale(1.05);
 }
 
 .save-api-btn {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -468,11 +503,11 @@
   font-weight: 600;
 }
 
-/* 저장 버튼 */
+/* ?�??버튼 */
 .save-btn {
   width: 100%;
   padding: 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -487,7 +522,7 @@
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
 }
 
-/* ADM-004: 퍼포먼스 대시보드 */
+/* ADM-004: ?�포먼스 ?�?�보??*/
 .performance-dashboard {
   display: flex;
   flex-direction: column;
@@ -578,7 +613,7 @@
 
 .chart-bar {
   flex: 1;
-  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, #ff6b35 0%, #f7931e 100%);
   border-radius: 8px 8px 0 0;
   position: relative;
   display: flex;
@@ -643,7 +678,7 @@
 }
 
 .ranking-item:hover {
-  border-color: #667eea;
+  border-color: #ff6b35;
   transform: translateX(5px);
 }
 
@@ -661,7 +696,7 @@
 .member-score {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #667eea;
+  color: #ff6b35;
   min-width: 60px;
   text-align: right;
 }
@@ -673,7 +708,7 @@
   text-align: right;
 }
 
-/* ADM-005: 보상 시스템 */
+/* ADM-005: 보상 ?�스??*/
 .rewards-system,
 .customize-fields,
 .integrations-settings {
@@ -787,7 +822,7 @@
   color: #ef4444;
 }
 
-/* ADM-006: 항목 커스터마이징 */
+/* ADM-006: ??�� 커스?�마?�징 */
 .add-field-btn {
   padding: 12px 24px;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -824,7 +859,7 @@
 .field-order {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -914,7 +949,7 @@
   color: #d97706;
 }
 
-/* INT-001: 연동 설정 */
+/* INT-001: ?�동 ?�정 */
 .integration-cards {
   display: flex;
   flex-direction: column;
@@ -930,7 +965,7 @@
 }
 
 .integration-card:hover {
-  border-color: #667eea;
+  border-color: #ff6b35;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
 }
 
@@ -949,7 +984,7 @@
 .integration-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -1012,7 +1047,7 @@
 }
 
 .integration-toggle input:checked + .toggle-slider {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
 }
 
 .integration-toggle input:checked + .toggle-slider:before {
@@ -1037,7 +1072,7 @@
 
 .integration-config input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #ff6b35;
 }
 
 .test-connection-btn {
@@ -1056,13 +1091,13 @@
   border-color: #cbd5e1;
 }
 
-/* ORG-001: 기업 내 점수 비교 스타일 */
+/* ORG-001: 기업 ???�수 비교 ?��???*/
 .org-comparison-settings {
   padding: 30px;
 }
 
 .company-info-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   border-radius: 16px;
   padding: 30px;
@@ -1248,7 +1283,7 @@
 
 .chart-bar-fill {
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -1262,7 +1297,7 @@
   font-size: 16px;
 }
 
-/* ORG-002: 조직 순위 스타일 */
+/* ORG-002: 조직 ?�위 ?��???*/
 .org-rankings-settings {
   padding: 30px;
 }
@@ -1287,12 +1322,12 @@
 }
 
 .type-btn:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #ff6b35;
+  color: #ff6b35;
 }
 
 .type-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   border-color: transparent;
 }
@@ -1355,7 +1390,7 @@
 .podium-score {
   font-size: 32px;
   font-weight: 700;
-  color: #667eea;
+  color: #ff6b35;
   margin-bottom: 12px;
 }
 
@@ -1390,7 +1425,7 @@
 }
 
 .ranking-item:hover {
-  border-color: #667eea;
+  border-color: #ff6b35;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
 }
 
@@ -1409,7 +1444,7 @@
 .rank-number {
   font-size: 24px;
   font-weight: 700;
-  color: #667eea;
+  color: #ff6b35;
 }
 
 .ranking-content {
@@ -1455,7 +1490,7 @@
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   transition: width 0.5s ease;
 }
 
@@ -1469,8 +1504,8 @@
 .export-btn {
   padding: 14px 28px;
   background: white;
-  border: 2px solid #667eea;
-  color: #667eea;
+  border: 2px solid #ff6b35;
+  color: #ff6b35;
   border-radius: 10px;
   font-size: 15px;
   font-weight: 600;
@@ -1479,11 +1514,11 @@
 }
 
 .export-btn:hover {
-  background: #667eea;
+  background: #ff6b35;
   color: white;
 }
 
-/* ORG-003: 주간 리포트 스타일 */
+/* ORG-003: 주간 리포???��???*/
 .reports-settings {
   padding: 30px;
 }
@@ -1552,7 +1587,7 @@
 }
 
 .report-main-toggle input:checked + .toggle-slider {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
 }
 
 .report-main-toggle input:checked + .toggle-slider:before {
@@ -1608,7 +1643,7 @@
 .option-group select:focus,
 .option-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #ff6b35;
 }
 
 .content-options {
@@ -1636,7 +1671,7 @@
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #667eea;
+  accent-color: #ff6b35;
 }
 
 .checkbox-option span {
@@ -1708,7 +1743,7 @@
   padding: 12px 20px;
   background: white;
   border: 2px dashed #cbd5e1;
-  color: #667eea;
+  color: #ff6b35;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
@@ -1716,7 +1751,7 @@
 }
 
 .add-recipient-btn:hover {
-  border-color: #667eea;
+  border-color: #ff6b35;
   background: #f8fafc;
 }
 
@@ -1728,7 +1763,7 @@
 }
 
 .preview-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   padding: 20px;
 }
@@ -1784,7 +1819,7 @@
 .preview-stat .stat-value {
   font-size: 20px;
   font-weight: 700;
-  color: #667eea;
+  color: #ff6b35;
 }
 
 .preview-text {
@@ -1814,8 +1849,8 @@
 .test-send-btn {
   padding: 14px 28px;
   background: white;
-  border: 2px solid #667eea;
-  color: #667eea;
+  border: 2px solid #ff6b35;
+  color: #ff6b35;
   border-radius: 10px;
   font-size: 15px;
   font-weight: 600;

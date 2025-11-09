@@ -61,7 +61,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -113,7 +113,7 @@
 }
 
 .default-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   padding: 4px 12px;
   border-radius: 12px;
@@ -176,7 +176,7 @@
   background: #da190b;
 }
 
-/* 편집 모드 */
+/* ?�집 모드 */
 .template-editor {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
@@ -236,7 +236,7 @@
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #ff6b35;
 }
 
 .form-group textarea {
@@ -272,7 +272,7 @@
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
 }
 
@@ -308,7 +308,7 @@
   white-space: pre-wrap;
 }
 
-/* 스타일 프리셋 섹션 */
+/* ?��????�리???�션 */
 .preset-section {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 12px;
@@ -369,7 +369,7 @@
   text-align: center;
 }
 
-/* 디자인 설정 섹션 */
+/* ?�자???�정 ?�션 */
 .design-section {
   background: #f8f9fa;
   border-radius: 12px;
@@ -390,7 +390,7 @@
 .design-section-title svg {
   width: 24px;
   height: 24px;
-  color: #667eea;
+  color: #ff6b35;
 }
 
 .design-grid {
@@ -425,7 +425,7 @@
 .design-group input[type="text"]:focus,
 .design-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #ff6b35;
 }
 
 .color-input-group {
@@ -447,7 +447,7 @@
   flex: 1;
 }
 
-/* 스크롤바 스타일 */
+/* ?�크롤바 ?��???*/
 .template-card-content::-webkit-scrollbar,
 .preview-content::-webkit-scrollbar {
   width: 8px;

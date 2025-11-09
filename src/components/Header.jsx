@@ -5,7 +5,10 @@ function Header({ user, onLogin, onLogout, onTemplateClick, onAdminClick }) {
   return (
     <header className="header">
       <div className="header-left">
-        <h1 className="logo">Daily Snippet</h1>
+        <div className="logo-container">
+          <div className="logo-icon">🟠</div>
+          <h1 className="logo">한화 Daily Snippet</h1>
+        </div>
       </div>
       
       <div className="header-right">

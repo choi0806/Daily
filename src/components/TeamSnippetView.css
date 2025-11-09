@@ -42,7 +42,7 @@
   min-height: 500px;
 }
 
-/* 내 스니펫 섹션 */
+/* ???�니???�션 */
 .my-snippet-section {
   flex: 1;
   padding: 24px;
@@ -97,8 +97,8 @@
 
 .edit-btn {
   background-color: transparent;
-  border: 1px solid #667eea;
-  color: #667eea;
+  border: 1px solid #ff6b35;
+  color: #ff6b35;
   padding: 6px 16px;
   border-radius: 6px;
   font-size: 13px;
@@ -108,7 +108,7 @@
 }
 
 .edit-btn:hover {
-  background-color: #667eea;
+  background-color: #ff6b35;
   color: white;
 }
 
@@ -137,7 +137,7 @@
 }
 
 .write-snippet-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   border: none;
   padding: 10px 24px;
@@ -162,7 +162,7 @@
 }
 
 .snippet-card.my-snippet {
-  border: 2px solid #667eea;
+  border: 2px solid #ff6b35;
   box-shadow: 0 2px 12px rgba(102, 126, 234, 0.1);
 }
 
@@ -180,7 +180,7 @@
   align-items: center;
 }
 
-/* USR-002: AI 점수 표시 스타일 */
+/* USR-002: AI ?�수 ?�시 ?��???*/
 .ai-score-display {
   display: flex;
   align-items: center;
@@ -216,7 +216,7 @@
   line-height: 1;
 }
 
-/* AI 코멘트 섹션 */
+/* AI 코멘???�션 */
 .ai-comments-section {
   margin-top: 24px;
   padding: 20px;
@@ -301,7 +301,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -379,7 +379,7 @@
   font-weight: 500;
 }
 
-/* 팀원 섹션 */
+/* ?�???�션 */
 .teammates-section {
   flex: 0 0 350px;
   padding: 24px;
@@ -416,7 +416,7 @@
 
 .teammate-item:hover {
   background-color: #f0f2f5;
-  border-color: #667eea;
+  border-color: #ff6b35;
   transform: translateX(4px);
 }
 
@@ -430,7 +430,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -583,7 +583,7 @@
 }
 
 .primary-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
 }
 
@@ -594,12 +594,12 @@
 
 .secondary-btn {
   background-color: #fff;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #ff6b35;
+  border: 2px solid #ff6b35;
 }
 
 .secondary-btn:hover {
-  background-color: #667eea;
+  background-color: #ff6b35;
   color: white;
 }
 

@@ -62,7 +62,7 @@
   margin: 0;
 }
 
-/* 타임어택 타이머 */
+/* ?�?�어???�?�머 */
 .time-attack-timer {
   display: flex;
   align-items: center;
@@ -184,7 +184,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -248,7 +248,7 @@
 }
 
 .template-item:hover {
-  border-color: #667eea;
+  border-color: #ff6b35;
   background-color: #f8f9ff;
   transform: translateX(4px);
 }
@@ -259,7 +259,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   border-radius: 8px;
   color: white;
   flex-shrink: 0;
@@ -291,7 +291,7 @@
 .check-icon {
   width: 20px;
   height: 20px;
-  color: #667eea;
+  color: #ff6b35;
   opacity: 0;
   transition: opacity 0.2s;
 }
@@ -336,14 +336,14 @@
 
 .type-btn:hover {
   background-color: #e8e8e8;
-  border-color: #667eea;
+  border-color: #ff6b35;
   color: #333;
   transform: translateY(-2px);
 }
 
 .type-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-color: #667eea;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  border-color: #ff6b35;
   color: white;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
@@ -374,7 +374,7 @@
 
 .snippet-textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #ff6b35;
 }
 
 .snippet-textarea::placeholder {
@@ -382,7 +382,7 @@
   line-height: 1.6;
 }
 
-/* AI 점수 미리보기 */
+/* AI ?�수 미리보기 */
 .ai-score-preview {
   margin-top: 20px;
   padding: 20px;
@@ -486,7 +486,7 @@
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
 }
 

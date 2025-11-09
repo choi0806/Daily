@@ -588,9 +588,11 @@ API 엔드포인트 5개 구현
         />
       )}
 
-      {/* 관리자 설정 페이지 */}
+      {/* 관리자 설정 페이지 - 전체화면 오버레이 */}
       {currentPage === 'admin' && currentUser.isAdmin && (
-        <AdminSettings />
+        <div className="admin-page-overlay">
+          <AdminSettings onClose={() => setCurrentPage('home')} />
+        </div>
       )}
 
       {/* 템플릿 에디터 */}
