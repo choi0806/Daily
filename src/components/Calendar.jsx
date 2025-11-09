@@ -57,13 +57,17 @@ function Calendar({ onDateClick, snippets, schedules, tomorrowPlans }) {
       // aiScore와 healthScore가 객체(total 필드 포함) 또는 숫자일 수 있음
       const aiValue = typeof s.aiScore === 'object' ? (s.aiScore?.total || 0) : (s.aiScore || 0);
       const healthValue = typeof s.healthScore === 'object' ? (s.healthScore?.total || 0) : (s.healthScore || 0);
+      // legacy 또는 저장된 총 점수(score) 우선 사용
+      const snippetValue = typeof s.score === 'number' ? s.score : aiValue;
       return {
         ai: aiValue,
-        health: healthValue
+        health: healthValue,
+        score: snippetValue
       };
     }) : [];
     const avgAiScore = snippetScores.length > 0 ? Math.round(snippetScores.reduce((sum, s) => sum + s.ai, 0) / snippetScores.length) : 0;
     const avgHealthScore = snippetScores.length > 0 ? Math.round(snippetScores.reduce((sum, s) => sum + s.health, 0) / snippetScores.length * 10) / 10 : 0;
+    const avgSnippetScore = snippetScores.length > 0 ? Math.round(snippetScores.reduce((sum, s) => sum + s.score, 0) / snippetScores.length) : 0;
 
     days.push(
       <div 
@@ -75,7 +79,7 @@ function Calendar({ onDateClick, snippets, schedules, tomorrowPlans }) {
         <div className="day-indicators">
           {viewMode === 'snippet' && snippetCount > 0 && (
             <div className="day-snippet-info">
-              <span className="snippet-score-text">AI: {avgAiScore} / 헬스: {avgHealthScore}</span>
+              <span className="snippet-score-text">스니펫: {avgSnippetScore} / 헬스: {avgHealthScore}</span>
             </div>
           )}
           {viewMode === 'schedule' && scheduleCount > 0 && (
