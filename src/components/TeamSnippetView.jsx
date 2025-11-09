@@ -81,23 +81,23 @@ function TeamSnippetView({ date, teamSnippets, currentUser, onClose, onWriteSnip
                   
                   {/* 점수 배지들 */}
                   <div className="snippet-scores">
-                    {displayedSnippet.aiScore && (
-                      <div className="ai-score-display">
-                        <div className="score-badge">
-                          <span className="score-number">{displayedSnippet.aiScore.total}</span>
-                          <span className="score-max">/100</span>
-                        </div>
+                    <div className="ai-score-display">
+                      <div className="score-badge">
+                        <span className="score-number">
+                          {displayedSnippet.aiScore?.total || displayedSnippet.aiScore || 0}
+                        </span>
+                        <span className="score-max">/100</span>
                       </div>
-                    )}
+                    </div>
                     
-                    {displayedSnippet.healthScore && (
-                      <div className="health-score-display">
-                        <div className="score-badge health">
-                          <span className="score-number">{displayedSnippet.healthScore}</span>
-                          <span className="score-max">/10</span>
-                        </div>
+                    <div className="health-score-display">
+                      <div className="score-badge health">
+                        <span className="score-number">
+                          {displayedSnippet.healthScore || 0}
+                        </span>
+                        <span className="score-max">/10</span>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
                 
