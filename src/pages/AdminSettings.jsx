@@ -171,60 +171,64 @@ function AdminSettings({ onClose }) {
       </div>
 
       <div className="admin-tabs">
-        <button
-          className={`tab-btn ${activeTab === 'scoring' ? 'active' : ''}`}
-          onClick={() => setActiveTab('scoring')}
-        >
-          채점 기준
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'team' ? 'active' : ''}`}
-          onClick={() => setActiveTab('team')}
-        >
-          팀 구성 관리
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'api' ? 'active' : ''}`}
-          onClick={() => setActiveTab('api')}
-        >
-          API 설정
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'performance' ? 'active' : ''}`}
-          onClick={() => setActiveTab('performance')}
-        >
-          성과 분석
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'customize' ? 'active' : ''}`}
-          onClick={() => setActiveTab('customize')}
-        >
-          항목 커스터마이징
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'integrations' ? 'active' : ''}`}
-          onClick={() => setActiveTab('integrations')}
-        >
-          연동 설정
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'orgComparison' ? 'active' : ''}`}
-          onClick={() => setActiveTab('orgComparison')}
-        >
-          부서별 비교
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'orgRankings' ? 'active' : ''}`}
-          onClick={() => setActiveTab('orgRankings')}
-        >
-          조직 순위
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'reports' ? 'active' : ''}`}
-          onClick={() => setActiveTab('reports')}
-        >
-          주간 리포트
-        </button>
+        <div className="admin-tabs-row">
+          <button
+            className={`tab-btn ${activeTab === 'scoring' ? 'active' : ''}`}
+            onClick={() => setActiveTab('scoring')}
+          >
+            채점 기준
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'team' ? 'active' : ''}`}
+            onClick={() => setActiveTab('team')}
+          >
+            팀 구성 관리
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'api' ? 'active' : ''}`}
+            onClick={() => setActiveTab('api')}
+          >
+            API 설정
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'performance' ? 'active' : ''}`}
+            onClick={() => setActiveTab('performance')}
+          >
+            성과 분석
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'customize' ? 'active' : ''}`}
+            onClick={() => setActiveTab('customize')}
+          >
+            항목 커스터마이징
+          </button>
+        </div>
+        <div className="admin-tabs-row">
+          <button
+            className={`tab-btn ${activeTab === 'integrations' ? 'active' : ''}`}
+            onClick={() => setActiveTab('integrations')}
+          >
+            연동 설정
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'orgComparison' ? 'active' : ''}`}
+            onClick={() => setActiveTab('orgComparison')}
+          >
+            부서별 비교
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'orgRankings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('orgRankings')}
+          >
+            조직 순위
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'reports' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reports')}
+          >
+            주간 리포트
+          </button>
+        </div>
       </div>
 
       <div className="admin-content">
@@ -740,87 +744,74 @@ function AdminSettings({ onClose }) {
         {/* ORG-001: 기업 내 점수 비교 */}
         {activeTab === 'orgComparison' && (
           <div className="org-comparison-settings">
-            <h2>기업 내 부서별 점수 비교</h2>
-            <p className="description">동일 기업 내 부서별 평균 점수를 비교하고 분석합니다</p>
+            <h2>성과 분석</h2>
+            <p className="description">조직의 부서별 성과를 분석하고 비교합니다</p>
 
-            <div className="company-info-card">
-              <div className="company-header">
-                <h3>{orgComparison.company}</h3>
+            <div className="comparison-main-grid">
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <div className="stat-icon">📊</div>
+                  <div className="stat-content">
+                    <span className="stat-label">조직</span>
+                    <span className="stat-value">{orgComparison.company}</span>
+                  </div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-icon">🏢</div>
+                  <div className="stat-content">
+                    <span className="stat-label">전체 부서</span>
+                    <span className="stat-value">{orgComparison.departments.length}</span>
+                  </div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-icon">👥</div>
+                  <div className="stat-content">
+                    <span className="stat-label">전체 인원</span>
+                    <span className="stat-value">{orgComparison.departments.reduce((sum, dept) => sum + dept.memberCount, 0)}명</span>
+                  </div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-icon">⭐</div>
+                  <div className="stat-content">
+                    <span className="stat-label">평균 점수</span>
+                    <span className="stat-value">{Math.round(orgComparison.departments.reduce((sum, dept) => sum + dept.avgScore, 0) / orgComparison.departments.length)}점</span>
+                  </div>
+                </div>
               </div>
-              <div className="company-stats">
-                <div className="stat-item">
-                  <span className="stat-label">전체 부서</span>
-                  <span className="stat-value">{orgComparison.departments.length}개</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">전체 인원</span>
-                  <span className="stat-value">
-                    {orgComparison.departments.reduce((sum, dept) => sum + dept.memberCount, 0)}명
-                  </span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">평균 점수</span>
-                  <span className="stat-value">
-                    {Math.round(orgComparison.departments.reduce((sum, dept) => sum + dept.avgScore, 0) / orgComparison.departments.length)}점
-                  </span>
-                </div>
-              </div>
-            </div>
 
-            <div className="departments-comparison">
-              <h3>부서별 성과 비교</h3>
-              <div className="comparison-table">
-                <div className="table-header">
-                  <div className="col-rank">순위</div>
-                  <div className="col-dept">부서명</div>
-                  <div className="col-score">평균 점수</div>
-                  <div className="col-members">인원</div>
-                  <div className="col-growth">성장률</div>
-                </div>
-                {[...orgComparison.departments]
-                  .sort((a, b) => b.avgScore - a.avgScore)
-                  .map((dept, index) => (
-                    <div key={dept.id} className={`table-row ${index === 0 ? 'top-rank' : ''}`}>
-                      <div className="col-rank">
-                        {index === 0 && '🥇'}
-                        {index === 1 && '🥈'}
-                        {index === 2 && '🥉'}
-                        {index > 2 && `${index + 1}위`}
-                      </div>
-                      <div className="col-dept">{dept.name}</div>
-                      <div className="col-score">
-                        <div className="score-bar-container">
-                          <div className="score-bar" style={{ width: `${dept.avgScore}%` }}></div>
-                          <span className="score-text">{dept.avgScore}점</span>
+              <div className="departments-ranking">
+                <h3>부서별 순위</h3>
+                <div className="ranking-list">
+                  {[...orgComparison.departments]
+                    .sort((a, b) => b.avgScore - a.avgScore)
+                    .map((dept, index) => (
+                      <div key={dept.id} className="ranking-item">
+                        <div className="ranking-rank">
+                          {index === 0 && <span className="rank-badge gold">1위</span>}
+                          {index === 1 && <span className="rank-badge silver">2위</span>}
+                          {index === 2 && <span className="rank-badge bronze">3위</span>}
+                          {index > 2 && <span className="rank-badge">{index + 1}</span>}
+                        </div>
+                        <div className="ranking-info">
+                          <div className="dept-name-row">
+                            <span className="dept-name">{dept.name}</span>
+                            <span className="member-count">({dept.memberCount}명)</span>
+                          </div>
+                          <div className="score-display">
+                            <div className="score-bar">
+                              <div className="score-fill" style={{ width: `${dept.avgScore}%` }}></div>
+                            </div>
+                            <span className="score-number">{dept.avgScore}점</span>
+                          </div>
+                        </div>
+                        <div className="ranking-growth">
+                          <span className={`growth-badge ${dept.growthRate >= 0 ? 'up' : 'down'}`}>
+                            {dept.growthRate >= 0 ? '↑' : '↓'} {Math.abs(dept.growthRate)}%
+                          </span>
                         </div>
                       </div>
-                      <div className="col-members">{dept.memberCount}명</div>
-                      <div className="col-growth">
-                        <span className={`growth-badge ${dept.growthRate >= 0 ? 'positive' : 'negative'}`}>
-                          {dept.growthRate >= 0 ? '↑' : '↓'} {Math.abs(dept.growthRate)}%
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-            <div className="comparison-chart-section">
-              <h3>부서별 성과 시각화</h3>
-              <div className="chart-container">
-                {orgComparison.departments.map(dept => (
-                  <div key={dept.id} className="chart-bar-item">
-                    <div className="chart-label">{dept.name}</div>
-                    <div className="chart-bar-wrapper">
-                      <div 
-                        className="chart-bar-fill" 
-                        style={{ width: `${(dept.avgScore / 100) * 100}%` }}
-                      >
-                        <span className="chart-value">{dept.avgScore}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                    ))}
+                </div>
               </div>
             </div>
           </div>

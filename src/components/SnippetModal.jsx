@@ -341,14 +341,26 @@ Tomorrow (내일 할 일)
           {/* USR-002: AI 점수 미리보기 */}
           {content.length > 20 && (
             <div className="ai-score-preview">
-              <h4>AI 예상 점수</h4>
+              <h4>스니펫 점수</h4>
               {(() => {
                 const previewScore = calculateAIScore(content);
                 return (
                   <div className="score-preview-content">
-                    <div className="score-circle">
-                      <span className="score-number">{previewScore.total}</span>
-                      <span className="score-total">/100</span>
+                    <div className="score-display">
+                      <div className="score-item">
+                        <span className="score-label">스니펫 점수</span>
+                        <div className="score-circle">
+                          <span className="score-number">{previewScore.total}</span>
+                          <span className="score-total">/100</span>
+                        </div>
+                      </div>
+                      <div className="score-item">
+                        <span className="score-label">헬스체크 점수</span>
+                        <div className="score-circle health">
+                          <span className="score-number">{healthScore}</span>
+                          <span className="score-total">/10</span>
+                        </div>
+                      </div>
                     </div>
                     <div className="score-breakdown">
                       {previewScore.comments.slice(0, 3).map((comment, idx) => (

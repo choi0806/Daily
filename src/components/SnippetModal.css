@@ -400,8 +400,29 @@
 
 .score-preview-content {
   display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.score-display {
+  display: flex;
   gap: 20px;
   align-items: center;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
 }
 
 .score-circle {
@@ -409,23 +430,31 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   background: white;
   border-radius: 50%;
-  border: 4px solid #0ea5e9;
+  border: 3px solid #ff6b35;
   flex-shrink: 0;
 }
 
+.score-circle.health {
+  border-color: #f7931e;
+}
+
 .score-number {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
-  color: #0369a1;
+  color: #ff6b35;
   line-height: 1;
 }
 
+.score-circle.health .score-number {
+  color: #f7931e;
+}
+
 .score-total {
-  font-size: 12px;
+  font-size: 11px;
   color: #64748b;
   font-weight: 600;
 }
@@ -435,6 +464,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 200px;
 }
 
 .score-comment {
@@ -442,9 +472,9 @@
   font-size: 13px;
   color: #334155;
   padding: 6px 12px;
-  background: white;
+  background: rgba(255, 107, 53, 0.05);
   border-radius: 6px;
-  border-left: 3px solid #0ea5e9;
+  border-left: 3px solid #ff6b35;
 }
 
 .more-comments {

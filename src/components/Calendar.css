@@ -188,6 +188,41 @@
   margin-top: 8px;
 }
 
+.day-scores {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.score-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 24px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.score-badge.ai {
+  background: rgba(255, 107, 53, 0.15);
+  color: #ff6b35;
+  border: 1px solid #ff6b35;
+}
+
+.score-badge.health {
+  background: rgba(247, 147, 30, 0.15);
+  color: #f7931e;
+  border: 1px solid #f7931e;
+}
+
+.score-value {
+  line-height: 1;
+}
+
 .day-avatars {
   display: flex;
   flex-wrap: wrap;
@@ -233,7 +268,7 @@
   color: #ff6b35;
 }
 
-/* INT-002: Tomorrow ?�시 */
+/* INT-002: Tomorrow ?�시 */
 .tomorrow-indicator {
   display: flex;
   align-items: center;

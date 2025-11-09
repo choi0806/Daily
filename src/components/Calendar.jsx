@@ -52,6 +52,14 @@ function Calendar({ onDateClick, snippets, schedules, tomorrowPlans }) {
     
     const isToday = day === 18 && currentDate.getMonth() === 9; // October 18
 
+    // 날짜의 스니펫들의 점수 계산
+    const snippetScores = dateSnippets ? dateSnippets.map(s => ({
+      ai: s.aiScore || 0,
+      health: s.healthScore || 0
+    })) : [];
+    const avgAiScore = snippetScores.length > 0 ? Math.round(snippetScores.reduce((sum, s) => sum + s.ai, 0) / snippetScores.length) : 0;
+    const avgHealthScore = snippetScores.length > 0 ? Math.round(snippetScores.reduce((sum, s) => sum + s.health, 0) / snippetScores.length * 10) / 10 : 0;
+
     days.push(
       <div 
         key={day} 
@@ -61,13 +69,13 @@ function Calendar({ onDateClick, snippets, schedules, tomorrowPlans }) {
         <span className="day-number">{day}</span>
         <div className="day-indicators">
           {viewMode === 'snippet' && snippetCount > 0 && (
-            <div className="day-avatars">
-              {Array.from({ length: Math.min(snippetCount, 4) }).map((_, i) => (
-                <div key={i} className="avatar"></div>
-              ))}
-              {snippetCount > 4 && (
-                <div className="avatar-count">+{snippetCount - 4}</div>
-              )}
+            <div className="day-scores">
+              <div className="score-badge ai">
+                <span className="score-value">{avgAiScore}</span>
+              </div>
+              <div className="score-badge health">
+                <span className="score-value">{avgHealthScore}</span>
+              </div>
             </div>
           )}
           {viewMode === 'schedule' && scheduleCount > 0 && (

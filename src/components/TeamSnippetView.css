@@ -473,15 +473,25 @@
 .teammate-score {
   font-size: 12px;
   font-weight: 700;
-  color: #0369a1;
-  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
   padding: 4px 10px;
   border-radius: 12px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 4px;
-  border: 1px solid #7dd3fc;
+  border: 1px solid;
+}
+
+.teammate-score.ai {
+  color: #ff6b35;
+  background: rgba(255, 107, 53, 0.1);
+  border-color: #ff6b35;
+}
+
+.teammate-score.health {
+  color: #f7931e;
+  background: rgba(247, 147, 30, 0.1);
+  border-color: #f7931e;
 }
 
 .teammate-score .score-icon {
