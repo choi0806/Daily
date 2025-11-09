@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './Calendar.css';
 
-function Calendar({ onDateClick, snippets, schedules, tomorrowPlans }) {
+function Calendar({ onDateClick, snippets, schedules, tomorrowPlans, currentUser }) {
   const [currentDate, setCurrentDate] = useState(new Date(2025, 9, 1)); // October 2025
   const [viewMode, setViewMode] = useState('snippet'); // 'snippet' or 'schedule'
 
@@ -53,7 +53,7 @@ function Calendar({ onDateClick, snippets, schedules, tomorrowPlans }) {
     const isToday = day === 18 && currentDate.getMonth() === 9; // October 18
 
     // 날짜의 스니펫들의 점수 계산
-    const snippetScores = dateSnippets ? dateSnippets.map(s => {
+  const snippetScores = dateSnippets ? dateSnippets.map(s => {
       // aiScore와 healthScore가 객체(total 필드 포함) 또는 숫자일 수 있음
       const aiValue = typeof s.aiScore === 'object' ? (s.aiScore?.total || 0) : (s.aiScore || 0);
       const healthValue = typeof s.healthScore === 'object' ? (s.healthScore?.total || 0) : (s.healthScore || 0);
@@ -68,6 +68,10 @@ function Calendar({ onDateClick, snippets, schedules, tomorrowPlans }) {
     const avgAiScore = snippetScores.length > 0 ? Math.round(snippetScores.reduce((sum, s) => sum + s.ai, 0) / snippetScores.length) : 0;
     const avgHealthScore = snippetScores.length > 0 ? Math.round(snippetScores.reduce((sum, s) => sum + s.health, 0) / snippetScores.length * 10) / 10 : 0;
     const avgSnippetScore = snippetScores.length > 0 ? Math.round(snippetScores.reduce((sum, s) => sum + s.score, 0) / snippetScores.length) : 0;
+  // 현재 사용자의 스니펫이 있으면 해당 사용자의 score/health를 우선 표시
+  const mySnippet = currentUser && dateSnippets ? dateSnippets.find(s => s.userId === currentUser.id) : null;
+  const displaySnippetScore = mySnippet ? (typeof mySnippet.score === 'number' ? mySnippet.score : (typeof mySnippet.aiScore === 'object' ? (mySnippet.aiScore?.total || 0) : (mySnippet.aiScore || 0))) : avgSnippetScore;
+  const displayHealthScore = mySnippet ? (typeof mySnippet.healthScore === 'object' ? (mySnippet.healthScore?.total || 0) : (mySnippet.healthScore ?? 0)) : avgHealthScore;
 
     days.push(
       <div 
@@ -79,7 +83,7 @@ function Calendar({ onDateClick, snippets, schedules, tomorrowPlans }) {
         <div className="day-indicators">
           {viewMode === 'snippet' && snippetCount > 0 && (
             <div className="day-snippet-info">
-              <span className="snippet-score-text">스니펫: {avgSnippetScore} / 헬스: {avgHealthScore}</span>
+              <span className="snippet-score-text">스니펫: {displaySnippetScore} / 헬스: {displayHealthScore}</span>
             </div>
           )}
           {viewMode === 'schedule' && scheduleCount > 0 && (

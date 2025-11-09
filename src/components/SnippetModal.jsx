@@ -71,6 +71,7 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
     setSnippetType(snippet?.snippetType || 'daily');
     setContent(snippet?.content || '');
     setAiScore(snippet?.aiScore || null);
+    setHealthScore(snippet?.healthScore || 5);
   }, [snippet]);
 
   // USR-005: 타임어택 타이머

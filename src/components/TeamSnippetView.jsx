@@ -89,11 +89,10 @@ function TeamSnippetView({ date, teamSnippets, currentUser, onClose, onWriteSnip
                         <span className="score-max">/100</span>
                       </div>
                     </div>
-                    
                     <div className="health-score-display">
                       <div className="score-badge health">
                         <span className="score-number">
-                          {displayedSnippet.healthScore || 0}
+                          {typeof displayedSnippet.healthScore === 'object' ? (displayedSnippet.healthScore?.total ?? 0) : (displayedSnippet.healthScore ?? 0)}
                         </span>
                         <span className="score-max">/10</span>
                       </div>
@@ -105,7 +104,6 @@ function TeamSnippetView({ date, teamSnippets, currentUser, onClose, onWriteSnip
                       {displayedSnippet.title && (
                     <div className="snippet-title-row">
                       <h3 className="snippet-title">{displayedSnippet.title}</h3>
-                      <span className="health-badge">💪 {typeof displayedSnippet.healthScore === 'object' ? (displayedSnippet.healthScore?.total ?? 0) : (displayedSnippet.healthScore ?? 0)}</span>
                     </div>
                   )}
                   <div className="snippet-content">

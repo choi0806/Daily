@@ -169,7 +169,7 @@ Tomorrow (내일 할 일)
 중간 발표 진행 및 피드백 반영`,
         tags: [],
         aiScore: {
-          total: 95,
+          total: 82,
           breakdown: {
             what: 20,
             why: 25,
@@ -186,6 +186,10 @@ Tomorrow (내일 할 일)
           ],
           analyzedAt: '2025-10-15T10:30:00Z'
         },
+        // stored total score (legacy/summary)
+        score: 82,
+        // user's health check (set to 6)
+        healthScore: 6,
         likes: 0,
         likedBy: []
       },
@@ -222,6 +226,8 @@ Highlight
           ],
           analyzedAt: '2025-10-15T11:00:00Z'
         },
+        // teammate health set to 5
+        healthScore: 5,
         likes: 3,
         likedBy: [3, 4, 5]
       },
@@ -257,6 +263,8 @@ API 엔드포인트 5개 구현
           ],
           analyzedAt: '2025-10-15T14:20:00Z'
         },
+        // teammate health set to 6
+        healthScore: 6,
         likes: 1,
         likedBy: [1]
       }
@@ -524,6 +532,7 @@ API 엔드포인트 5개 구현
             snippets={teamSnippets}
             schedules={teamSchedules}
             tomorrowPlans={tomorrowPlans}
+            currentUser={currentUser}
           />
         </div>
         
