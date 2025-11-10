@@ -3,7 +3,6 @@ import './Leaderboard.css';
 
 function Leaderboard() {
   const [activeTab, setActiveTab] = useState('monthly');
-  const [categoryFilter, setCategoryFilter] = useState('all');
 
   // 전체 데이터 (기업/학교 구분 포함)
   const allData = {
@@ -61,18 +60,8 @@ function Leaderboard() {
   const getDisplayData = () => {
     const timeData = allData[activeTab];
     
-    if (categoryFilter === 'company') {
-      return timeData.companies;
-    } else if (categoryFilter === 'school') {
-      return timeData.schools;
-    } else {
-      // 전체: 기업과 학교 합쳐서 점수순 정렬
-      const combined = [...timeData.companies, ...timeData.schools];
-      return combined.sort((a, b) => b.score - a.score).map((item, index) => ({
-        ...item,
-        rank: index + 1
-      }));
-    }
+    // 항상 기업만 표시하도록 변경
+    return timeData.companies;
   };
 
   const displayData = getDisplayData();
@@ -81,26 +70,7 @@ function Leaderboard() {
     <div className="leaderboard">
       <h2 className="leaderboard-title">팀 리더보드</h2>
       
-      <div className="leaderboard-category-tabs">
-        <button 
-          className={`category-tab ${categoryFilter === 'all' ? 'active' : ''}`}
-          onClick={() => setCategoryFilter('all')}
-        >
-          전체
-        </button>
-        <button 
-          className={`category-tab ${categoryFilter === 'company' ? 'active' : ''}`}
-          onClick={() => setCategoryFilter('company')}
-        >
-          등록 기업
-        </button>
-        <button 
-          className={`category-tab ${categoryFilter === 'school' ? 'active' : ''}`}
-          onClick={() => setCategoryFilter('school')}
-        >
-          등록 학교
-        </button>
-      </div>
+      {/* 기업만 표시하도록 카테고리 탭 제거 */}
 
       <div className="leaderboard-tabs">
         <button 
