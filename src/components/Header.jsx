@@ -8,7 +8,7 @@ function Header({ user, onLogin, onLogout, onTemplateClick, onAdminClick }) {
         <div className="logo-container">
           <div className="logo-icon">
             {/* public/images/1.png 에 이미지를 넣어두면 이 경로로 표시됩니다 */}
-            <img src="/images/1.png" alt="한화 로고" className="logo-img" style={{ height: '36px' }} />
+           
           </div>
           <h1 className="logo">한화 Daily Snippet</h1>
         </div>
