@@ -67,9 +67,9 @@ function AdminSettings({ onClose }) {
 
   // ORG-001: 기업 내 점수 비교 데이터
   const [orgComparison, setOrgComparison] = useState({
-    company: '한화큐셀',
+    company: '한화세미텍',
     departments: [
-      { id: 1, name: '태양광사업부', avgScore: 92, memberCount: 28, growthRate: 15 },
+      { id: 1, name: '한화세미텍', avgScore: 95, memberCount: 32, growthRate: 18 },
       { id: 2, name: '에너지솔루션팀', avgScore: 88, memberCount: 18, growthRate: 8 },
       { id: 3, name: '경영관리팀', avgScore: 85, memberCount: 12, growthRate: 5 },
       { id: 4, name: '기술개발팀', avgScore: 90, memberCount: 22, growthRate: 12 },
@@ -81,7 +81,7 @@ function AdminSettings({ onClose }) {
   const [orgRankings, setOrgRankings] = useState({
     type: 'company', // 'company', 'school', 'department'
     rankings: [
-      { rank: 1, name: '한화큐셀', avgScore: 92, memberCount: 58, completionRate: 96 },
+      { rank: 1, name: '한화세미텍', avgScore: 95, memberCount: 72, completionRate: 98 },
       { rank: 2, name: '한화비전', avgScore: 90, memberCount: 45, completionRate: 95 },
       { rank: 3, name: '한화파워시스템', avgScore: 89, memberCount: 62, completionRate: 94 },
       { rank: 4, name: '한화에어로스페이스', avgScore: 88, memberCount: 78, completionRate: 93 },
