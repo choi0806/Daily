@@ -8,6 +8,17 @@ import TemplateEditor from './pages/TemplateEditor';
 import Login from './components/Login';
 import InitialSetup from './components/InitialSetup';
 import ChangePassword from './components/ChangePassword';
+
+// 현재 날짜를 가져오는 헬퍼 함수 (시스템 날짜 사용)
+const getTodayKST = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const today = `${year}-${month}-${day}`;
+  console.log('현재 시스템 날짜:', today, '시각:', now.toLocaleString('ko-KR'));
+  return today;
+};
 import ManagerDashboard from './components/ManagerDashboard';
 import { 
   onAuthChange, 
@@ -240,7 +251,8 @@ function App() {
   // 관리자인 경우 오늘 날짜의 팀원 스니펫 자동 로드
   useEffect(() => {
     if (userData?.isManager && currentUser?.id) {
-      const today = new Date().toISOString().split('T')[0];
+      const today = getTodayKST();
+      console.log('관리자 모드: 오늘 날짜로 설정:', today);
       setSelectedDate(today);
       loadSnippetsForDate(today);
     }
@@ -580,8 +592,8 @@ function App() {
         <ManagerDashboard
           currentUser={currentUser}
           userData={userData}
-          date={selectedDate || new Date().toISOString().split('T')[0]}
-          teamSnippets={selectedDate ? (teamSnippets[selectedDate] || []) : []}
+          date={getTodayKST()}
+          teamSnippets={teamSnippets[getTodayKST()] || []}
         />
       ) : currentPage === 'home' ? (
         <div className="main-content">

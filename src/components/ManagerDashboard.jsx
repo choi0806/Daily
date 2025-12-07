@@ -51,13 +51,17 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
     // 인사이트 분석
     analyzeInsights(teamSnippets);
 
-    // AI 요약 생성
-    if (teamSnippets.length > 0) {
-      generateAISummary(teamSnippets);
-    }
+    // AI 요약은 버튼 클릭 시에만 생성 (자동 생성 제거)
   }, [teamSnippets]);
 
   const generateAISummary = async (snippets) => {
+    console.log('🔄 AI 요약 버튼 클릭됨. 스니펫 수:', snippets.length);
+    
+    if (!snippets || snippets.length === 0) {
+      alert('팀원의 스니펫이 없습니다.');
+      return;
+    }
+    
     setIsLoadingSummary(true);
     try {
       console.log('AI 요약 생성 시작:', { 
@@ -75,23 +79,50 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
         message: error.message,
         stack: error.stack
       });
+      
+      // API 할당량 초과 시 기본 요약 생성
+      const manualSummary = generateManualSummary(snippets);
       setAiSummary({
-        summary: `요약 생성 중 오류가 발생했습니다: ${error.message}`,
-        projectProgress: {
-          status: '오류',
-          completedTasks: [],
-          inProgressTasks: [],
-          blockers: []
-        },
-        keyInsights: [],
-        highlights: [],
-        concerns: [],
-        topKeywords: [],
-        recommendations: []
+        summary: `AI 요약을 사용할 수 없습니다. (${error.message.includes('429') ? 'API 할당량 초과' : '오류 발생'})`,
+        ...manualSummary
       });
     } finally {
       setIsLoadingSummary(false);
     }
+  };
+
+  const generateManualSummary = (snippets) => {
+    // 수동으로 스니펫 분석
+    const allContent = snippets.map(s => s.content || '').join(' ');
+    const keywords = extractKeywords(allContent);
+    
+    return {
+      projectProgress: {
+        status: '진행 중',
+        completedTasks: snippets.filter(s => s.content?.includes('완료')).map(s => s.userName + '의 작업'),
+        inProgressTasks: snippets.map(s => s.userName + '의 작업'),
+        blockers: []
+      },
+      keyInsights: [`총 ${snippets.length}명의 팀원이 작성했습니다.`],
+      highlights: snippets.slice(0, 3).map(s => `${s.userName}: ${(s.content || '').substring(0, 50)}...`),
+      concerns: [],
+      topKeywords: keywords,
+      recommendations: ['팀원들의 스니펫을 검토하세요.']
+    };
+  };
+
+  const extractKeywords = (text) => {
+    const words = text.match(/[\uAC00-\uD7A3]+/g) || [];
+    const wordCount = {};
+    words.forEach(word => {
+      if (word.length > 1) {
+        wordCount[word] = (wordCount[word] || 0) + 1;
+      }
+    });
+    return Object.entries(wordCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([word]) => word);
   };
 
   const analyzeInsights = (snippets) => {
@@ -189,7 +220,18 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
 
           {/* AI 요약 */}
           <div className="insight-card activities-card summary-wide">
-            <h4>🤖 AI 팀 활동 요약</h4>
+            <div className="summary-header">
+              <h4>🤖 AI 팀 활동 요약</h4>
+              {!isLoadingSummary && (
+                <button 
+                  className="btn-generate-summary"
+                  onClick={() => generateAISummary(teamSnippets)}
+                  disabled={teamSnippets.length === 0}
+                >
+                  🔄 AI 요약 생성
+                </button>
+              )}
+            </div>
             {isLoadingSummary ? (
               <div className="loading-summary">
                 <div className="spinner"></div>
@@ -333,15 +375,38 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
                   </div>
                 </div>
                 <div className="snippet-content">
-                  <p>{snippet.content?.substring(0, 150) || '내용 없음'}...</p>
+                  <div className="content-section">
+                    <strong>📝 작성 내용:</strong>
+                    <p>{snippet.content || '내용 없음'}</p>
+                  </div>
+                  {snippet.accomplishments && snippet.accomplishments.length > 0 && (
+                    <div className="content-section">
+                      <strong>✅ 성과:</strong>
+                      <ul>
+                        {snippet.accomplishments.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {snippet.todoList && snippet.todoList.length > 0 && (
+                    <div className="content-section">
+                      <strong>📋 할 일:</strong>
+                      <ul>
+                        {snippet.todoList.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
                 <div className="snippet-footer">
                   <div className="snippet-stats">
                     <span className="likes">
-                      👍 {snippet.likes || 0}
+                      👍 {snippet.likes?.length || 0}
                     </span>
                     <span className="time">
-                      {snippet.createdAt ? new Date(snippet.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : ''}
+                      {snippet.timestamp ? new Date(snippet.timestamp).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : ''}
                     </span>
                   </div>
                 </div>

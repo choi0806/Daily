@@ -95,8 +95,13 @@ export const loginUser = async (userId, password) => {
         };
       }
     } catch (authError) {
-      // 계정이 없으면 자동 생성
+      // 계정이 없으면 초기 비밀번호 확인 후 자동 생성
       if (authError.code === 'auth/user-not-found' || authError.code === 'auth/invalid-credential') {
+        // 초기 비밀번호가 123456이 아니면 거부
+        if (password !== '123456') {
+          return { success: false, error: '최초 가입 시 비밀번호는 123456 이어야 합니다.' };
+        }
+        
         try {
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
           const userInfo = getUserInfo(id);

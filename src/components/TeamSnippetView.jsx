@@ -94,18 +94,6 @@ function TeamSnippetView({ date, teamSnippets, currentUser, onClose, onWriteSnip
                     ))}
                   </div>
                   
-                  {/* AI 피드백 섹션 */}
-                  {displayedSnippet.feedback && (
-                    <div className="ai-feedback-section">
-                      <h4>🤖 AI 코칭 피드백</h4>
-                      <div className="ai-feedback-content">
-                        {displayedSnippet.feedback.split('\n').map((line, i) => (
-                          <p key={i}>{line}</p>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
                   {displayedSnippet.tags && displayedSnippet.tags.length > 0 && (
                     <div className="snippet-tags">
                       {displayedSnippet.tags.map((tag, i) => (

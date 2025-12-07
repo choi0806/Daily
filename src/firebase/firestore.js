@@ -65,6 +65,8 @@ export const getSnippetsByDate = async (date, managerId = null) => {
 // 관리자의 팀원 스니펫 가져오기
 export const getTeamMemberSnippets = async (managerId, date) => {
   try {
+    console.log('getTeamMemberSnippets 호출:', { managerId, date });
+    
     const q = query(
       collection(db, 'snippets'),
       where('managerId', '==', managerId),
@@ -74,7 +76,9 @@ export const getTeamMemberSnippets = async (managerId, date) => {
     const querySnapshot = await getDocs(q);
     const snippets = [];
     querySnapshot.forEach((doc) => {
-      snippets.push({ id: doc.id, ...doc.data() });
+      const data = doc.data();
+      console.log('스니펫 문서:', { id: doc.id, managerId: data.managerId, date: data.date });
+      snippets.push({ id: doc.id, ...data });
     });
     
     console.log('getTeamMemberSnippets 결과:', snippets);
