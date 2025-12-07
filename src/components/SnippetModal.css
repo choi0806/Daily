@@ -382,83 +382,93 @@
   line-height: 1.6;
 }
 
-/* AI ?�수 미리보기 */
-.ai-score-preview {
-  margin-top: 20px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border: 2px solid #0ea5e9;
-  border-radius: 12px;
-}
-
-.ai-score-preview h4 {
-  margin: 0 0 16px 0;
-  font-size: 16px;
-  color: #0369a1;
-  font-weight: 700;
-}
-
-.score-preview-content {
+/* Feedback loading state */
+.feedback-loading {
   display: flex;
-  gap: 30px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-.score-display {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-}
-
-.score-item {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 8px;
-}
-
-.score-label {
-  font-size: 13px;
+  font-size: 14px;
+  color: #ff6b35;
   font-weight: 600;
-  color: #64748b;
-  text-align: center;
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
-.score-circle {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 70px;
-  height: 70px;
-  background: #ff6b35;
-  border-radius: 50%;
-  border: 3px solid #ff6b35;
-  flex-shrink: 0;
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
-.score-circle.health {
-  background: #ff6b35;
-  border-color: #ff6b35;
+/* Feedback result section */
+.feedback-result-section {
+  margin-top: 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
+  border: 2px solid #ff6b35;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
+  animation: slideDown 0.3s ease-out;
 }
 
-.score-number {
-  font-size: 24px;
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feedback-result-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  color: #d84315;
   font-weight: 700;
-  color: #ffffff;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 2px solid #ff6b35;
+  padding-bottom: 12px;
 }
 
-.score-circle.health .score-number {
-  color: #ffffff;
+.feedback-result-content {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #4a4a4a;
+  white-space: pre-wrap;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
-.score-total {
-  font-size: 11px;
-  color: #64748b;
-  font-weight: 600;
+.feedback-result-content::-webkit-scrollbar {
+  width: 6px;
 }
+
+.feedback-result-content::-webkit-scrollbar-track {
+  background: rgba(255, 107, 53, 0.1);
+  border-radius: 3px;
+}
+
+.feedback-result-content::-webkit-scrollbar-thumb {
+  background: #ff6b35;
+  border-radius: 3px;
+}
+
+.feedback-result-content p {
+  margin: 8px 0;
+}
+
+.feedback-result-content p:first-child {
+  margin-top: 0;
+}
+
+.feedback-result-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* score preview styles removed */
 
 .score-breakdown {
   flex: 1;

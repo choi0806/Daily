@@ -22,11 +22,16 @@
   padding: 20px;
   max-width: 1600px;
   margin: 0 auto;
+  align-items: center; /* vertically center sections */
+  min-height: calc(100vh - 120px); /* leave space for header */
 }
 
 .calendar-section {
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center calendar horizontally */
 }
 
 .leaderboard-section {

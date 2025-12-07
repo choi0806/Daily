@@ -79,25 +79,7 @@ function TeamSnippetView({ date, teamSnippets, currentUser, onClose, onWriteSnip
                     </div>
                   </div>
                   
-                  {/* 점수 배지들 */}
-                  <div className="snippet-scores">
-                    <div className="ai-score-display">
-                      <div className="score-badge">
-                        <span className="score-number">
-                          {displayedSnippet.aiScore?.total || displayedSnippet.aiScore || 0}
-                        </span>
-                        <span className="score-max">/100</span>
-                      </div>
-                    </div>
-                    <div className="health-score-display">
-                      <div className="score-badge health">
-                        <span className="score-number">
-                          {typeof displayedSnippet.healthScore === 'object' ? (displayedSnippet.healthScore?.total ?? 0) : (displayedSnippet.healthScore ?? 0)}
-                        </span>
-                        <span className="score-max">/10</span>
-                      </div>
-                    </div>
-                  </div>
+                  
                 </div>
                 
                 <div className="snippet-body">
@@ -112,39 +94,15 @@ function TeamSnippetView({ date, teamSnippets, currentUser, onClose, onWriteSnip
                     ))}
                   </div>
                   
-                  {/* USR-002: AI 코멘트 표시 */}
-                  {displayedSnippet.aiScore?.comments && (
-                    <div className="ai-comments-section">
-                      <h4>🤖 AI 피드백</h4>
-                      <div className="ai-comments">
-                        {displayedSnippet.aiScore.comments.map((comment, idx) => (
-                          <p key={idx} className="ai-comment">{comment}</p>
+                  {/* AI 피드백 섹션 */}
+                  {displayedSnippet.feedback && (
+                    <div className="ai-feedback-section">
+                      <h4>🤖 AI 코칭 피드백</h4>
+                      <div className="ai-feedback-content">
+                        {displayedSnippet.feedback.split('\n').map((line, i) => (
+                          <p key={i}>{line}</p>
                         ))}
                       </div>
-                      {displayedSnippet.aiScore.breakdown && (
-                        <div className="score-breakdown-detail">
-                          <div className="breakdown-item">
-                            <span className="breakdown-label">What</span>
-                            <span className="breakdown-value">{displayedSnippet.aiScore.breakdown.what}/20</span>
-                          </div>
-                          <div className="breakdown-item">
-                            <span className="breakdown-label">Why</span>
-                            <span className="breakdown-value">{displayedSnippet.aiScore.breakdown.why}/25</span>
-                          </div>
-                          <div className="breakdown-item">
-                            <span className="breakdown-label">Highlight</span>
-                            <span className="breakdown-value">{displayedSnippet.aiScore.breakdown.highlight}/20</span>
-                          </div>
-                          <div className="breakdown-item">
-                            <span className="breakdown-label">Lowlight</span>
-                            <span className="breakdown-value">{displayedSnippet.aiScore.breakdown.lowlight}/15</span>
-                          </div>
-                          <div className="breakdown-item">
-                            <span className="breakdown-label">Tomorrow</span>
-                            <span className="breakdown-value">{displayedSnippet.aiScore.breakdown.tomorrow}/20</span>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
                   
@@ -207,17 +165,9 @@ function TeamSnippetView({ date, teamSnippets, currentUser, onClose, onWriteSnip
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                       </svg>
                     </div>
-                    <div className="teammate-info">
+                        <div className="teammate-info">
                       <div className="teammate-name-row">
                         <span className="teammate-name">{snippet.userName}</span>
-                        <div className="teammate-scores">
-                            <span className="teammate-score ai">
-                              {snippet.aiScore?.total ?? snippet.aiScore ?? 0}점
-                            </span>
-                            <span className="teammate-score health">
-                              {typeof snippet.healthScore === 'object' ? (snippet.healthScore?.total ?? 0) : (snippet.healthScore ?? 0)}
-                            </span>
-                          </div>
                       </div>
                       <span className="teammate-preview">
                         {snippet.title || snippet.content.substring(0, 30) + '...'}

@@ -1,8 +1,11 @@
 .calendar {
   background-color: #fff;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  padding: 12px; /* reduced padding to show more of the calendar */
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  max-width: 1100px;
+  width: min(1100px, 94vw);
+  margin: 0 auto;
 }
 
 .calendar-top-section {
@@ -30,15 +33,15 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 10px 16px;
+  padding: 6px 10px;
   background: transparent;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #666;
-  transition: all 0.3s;
+  transition: all 0.2s;
 }
 
 .view-mode-tab svg {
@@ -68,7 +71,7 @@
 }
 
 .month-name {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #333;
 }
@@ -115,9 +118,9 @@
 .calendar-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  margin-bottom: 8px;
-  padding: 0 8px;
+  gap: 6px;
+  margin-bottom: 6px;
+  padding: 0 6px;
 }
 
 .weekday {
@@ -134,30 +137,44 @@
   gap: 8px;
 }
 
+/* ensure weeks stretch to full width and cells keep square ratio */
 .calendar-week {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 6px;
+}
+
+.calendar-week > .calendar-day {
+  /* make sure calendar-day fills its grid cell and keeps square shape */
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
 }
 
 .calendar-day {
   aspect-ratio: 1;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e9e9e9;
   border-radius: 8px;
-  padding: 8px;
+  padding: 6px; /* reduced padding */
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   display: flex;
   flex-direction: column;
   position: relative;
   background-color: #fff;
+  min-height: 72px; /* ensure compact but readable cells */
 }
 
 .calendar-day:hover {
   border-color: #ff6b35;
-  background-color: #f8f9ff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fbfbfd;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 .calendar-day.empty {
@@ -177,7 +194,7 @@
 }
 
 .day-number {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   color: #333;
   margin-bottom: auto;
@@ -189,11 +206,11 @@
 }
 
 .day-snippet-info {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   color: #ff6b35;
   text-align: center;
-  line-height: 1.3;
+  line-height: 1.2;
 }
 
 .snippet-score-text {
@@ -212,10 +229,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 24px;
-  border-radius: 12px;
-  font-size: 11px;
+  width: 28px;
+  height: 20px;
+  border-radius: 10px;
+  font-size: 10px;
   font-weight: 600;
 }
 
@@ -244,8 +261,8 @@
 }
 
 .avatar {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: #ff6b35;
   border: 2px solid white;
@@ -303,18 +320,18 @@
   color: #ff6b35;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .calendar {
-    padding: 16px;
+    padding: 10px;
   }
 
   .day-number {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .avatar {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 
   .avatar-count {

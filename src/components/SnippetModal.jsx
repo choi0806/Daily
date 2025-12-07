@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './SnippetModal.css';
+import { generateSnippetFeedback } from '../lib/gemini';
 
 const TEMPLATES = [
   {
@@ -62,16 +63,16 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
   const [snippetType, setSnippetType] = useState(snippet?.snippetType || 'daily');
   const [content, setContent] = useState(snippet?.content || '');
   const [showTemplates, setShowTemplates] = useState(false);
-  const [aiScore, setAiScore] = useState(snippet?.aiScore || null);
-  const [healthScore, setHealthScore] = useState(snippet?.healthScore || 5);
+  // 타임어택 관련 상태: 시간, 활성화, 그리고 타임업 시 입력 잠금
   const [timeLeft, setTimeLeft] = useState(300); // 5분 = 300초
   const [isTimeAttack, setIsTimeAttack] = useState(timeAttackMode);
+  const [isLocked, setIsLocked] = useState(false);
+  // AI 피드백 생성 상태
+  const [isGeneratingFeedback, setIsGeneratingFeedback] = useState(false);
 
   useEffect(() => {
     setSnippetType(snippet?.snippetType || 'daily');
     setContent(snippet?.content || '');
-    setAiScore(snippet?.aiScore || null);
-    setHealthScore(snippet?.healthScore || 5);
   }, [snippet]);
 
   // USR-005: 타임어택 타이머
@@ -82,9 +83,13 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          alert('시간이 종료되었습니다! 작성한 내용이 자동 저장됩니다.');
+          // 타임업: 자동 저장하고 입력을 잠급니다.
+          alert('시간이 종료되었습니다! 작성한 내용이 자동 저장되고 수정이 잠깁니다.');
+          setIsTimeAttack(false);
+          setIsLocked(true);
           if (content.trim()) {
-            handleSave();
+            // 저장은 하되 모달은 닫지 않음(사용자가 결과를 확인할 수 있도록)
+            handleSave(false);
           }
           return 0;
         }
@@ -93,7 +98,7 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isTimeAttack]);
+  }, [isTimeAttack, content]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -101,87 +106,48 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleSave = () => {
+  // closeAfter=true 면 저장 후 모달을 닫고,
+  // closeAfter=false 면 저장만 수행(타임업 자동저장 시 사용)
+  const handleSave = async (closeAfter = true) => {
     if (!content.trim()) {
       alert('내용을 입력해주세요.');
       return;
     }
 
-    // USR-002: AI 점수 계산 (프론트엔드 시뮬레이션)
-    const calculatedScore = calculateAIScore(content);
+    // AI 피드백 생성 시작 (백그라운드에서 진행)
+    setIsGeneratingFeedback(true);
     
+    // 먼저 스니펫을 저장 (피드백 없이)
     onSave(date, { 
       snippetType, 
       content,
-      aiScore: calculatedScore,
-      healthScore,
+      feedback: '', // 일단 빈 피드백으로 저장
       submittedAt: new Date().toISOString()
     });
-    onClose();
+
+    // 모달을 먼저 닫음
+    if (closeAfter) {
+      onClose();
+    }
+
+    // 백그라운드에서 AI 피드백 생성 후 다시 저장
+    try {
+      const feedback = await generateSnippetFeedback(content, '사용자');
+      // 피드백이 생성되면 다시 저장하여 업데이트
+      onSave(date, { 
+        snippetType, 
+        content,
+        feedback,
+        submittedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('피드백 생성 실패:', error);
+      // 실패해도 스니펫은 이미 저장되었으므로 문제없음
+    } finally {
+      setIsGeneratingFeedback(false);
+    }
   };
 
-  // USR-002: AI 점수 계산 함수 (프론트엔드 시뮬레이션)
-  const calculateAIScore = (text) => {
-    const hasWhat = /what|무엇|한\s*일/i.test(text);
-    const hasWhy = /why|왜|이유|목적/i.test(text);
-    const hasHighlight = /highlight|잘한|성과|완료/i.test(text);
-    const hasLowlight = /lowlight|아쉬운|개선|어려운/i.test(text);
-    const hasTomorrow = /tomorrow|내일|계획|예정/i.test(text);
-
-    const wordCount = text.trim().split(/\s+/).length;
-    const lengthScore = Math.min(wordCount / 10, 20); // 최대 20점
-
-    let score = 0;
-    let comments = [];
-
-    if (hasWhat) {
-      score += 20;
-      comments.push('✅ What 항목이 명확합니다');
-    } else {
-      comments.push('⚠️ What(무엇을 했는지) 항목을 추가해보세요');
-    }
-
-    if (hasWhy) {
-      score += 25;
-      comments.push('✅ Why 항목이 잘 작성되었습니다');
-    } else {
-      comments.push('⚠️ Why(왜 했는지) 배경을 추가해보세요');
-    }
-
-    if (hasHighlight) {
-      score += 20;
-      comments.push('✅ Highlight(성과)가 포함되어 있습니다');
-    } else {
-      comments.push('💡 Highlight(잘한 점)를 추가해보세요');
-    }
-
-    if (hasLowlight) {
-      score += 15;
-      comments.push('✅ Lowlight(개선점)이 포함되어 있습니다');
-    } else {
-      comments.push('💡 Lowlight(아쉬운 점)를 추가해보세요');
-    }
-
-    if (hasTomorrow) {
-      score += 20;
-      comments.push('✅ Tomorrow(내일 계획)이 명확합니다');
-    } else {
-      comments.push('⚠️ Tomorrow(내일 할 일)를 추가해보세요');
-    }
-
-    return {
-      total: Math.round(score),
-      breakdown: {
-        what: hasWhat ? 20 : 0,
-        why: hasWhy ? 25 : 0,
-        highlight: hasHighlight ? 20 : 0,
-        lowlight: hasLowlight ? 15 : 0,
-        tomorrow: hasTomorrow ? 20 : 0
-      },
-      comments: comments,
-      analyzedAt: new Date().toISOString()
-    };
-  };
 
   const handleTemplateSelect = (template) => {
     setContent(template.content);
@@ -223,12 +189,14 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
             <button 
               className={`time-attack-toggle ${isTimeAttack ? 'active' : ''}`}
               onClick={() => {
+                if (isLocked) return; // 잠금 상태면 변경 불가
                 setIsTimeAttack(!isTimeAttack);
                 if (!isTimeAttack) setTimeLeft(300);
               }}
               title="5분 타임어택 모드"
+              disabled={isLocked}
             >
-              ⚡ 타임어택
+              ⚡ 타임어택 {isTimeAttack ? `(${formatTime(timeLeft)})` : ''}
             </button>
             <button className="close-btn" onClick={onClose}>
               <svg viewBox="0 0 24 24" fill="currentColor">
@@ -321,7 +289,7 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
               id="snippet-content"
               className="snippet-textarea"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e) => { if (!isLocked) setContent(e.target.value); }}
               placeholder="What (무엇을 했나요?)
 예: 새로운 기능 개발, 버그 수정, 회의 참석 등
 
@@ -338,65 +306,17 @@ Tomorrow (내일 할 일)
 예: 리뷰 반영, 다음 단계 진행, 문서화 작업"
             />
           </div>
-
-          {/* USR-002: AI 점수 미리보기 */}
-          {content.length > 20 && (
-            <div className="ai-score-preview">
-              <h4>스니펫 점수</h4>
-              {(() => {
-                const previewScore = calculateAIScore(content);
-                return (
-                  <div className="score-preview-content">
-                    <div className="score-display">
-                      <div className="score-item">
-                        <span className="score-label">스니펫 점수</span>
-                        <div className="score-circle">
-                          <span className="score-number">{previewScore.total}</span>
-                          <span className="score-total">/100</span>
-                        </div>
-                      </div>
-                      <div className="score-item">
-                        <span className="score-label">헬스체크 점수</span>
-                        <div className="score-circle health">
-                          <span className="score-number">{healthScore}</span>
-                          <span className="score-total">/10</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="score-breakdown">
-                      {previewScore.comments.slice(0, 3).map((comment, idx) => (
-                        <p key={idx} className="score-comment">{comment}</p>
-                      ))}
-                      {previewScore.comments.length > 3 && (
-                        <p className="more-comments">+{previewScore.comments.length - 3}개 더...</p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-          )}
         </div>
         
-        <div className="health-check-section">
-          <h3>Health Check (1-10)</h3>
-          <p className="health-check-description">오늘 컨디션은 어떠셨나요?</p>
-          <div className="health-score-selector">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(score => (
-              <button
-                key={score}
-                className={`health-score-btn ${healthScore === score ? 'active' : ''}`}
-                onClick={() => setHealthScore(score)}
-              >
-                {score}
-              </button>
-            ))}
-          </div>
-        </div>
+        
         
         <div className="modal-footer">
-          <button className="cancel-btn" onClick={onClose}>취소</button>
-          <button className="save-btn" onClick={handleSave}>저장</button>
+          <button className="cancel-btn" onClick={onClose}>
+            취소
+          </button>
+          <button className="save-btn" onClick={() => handleSave(true)} disabled={isLocked}>
+            저장
+          </button>
         </div>
       </div>
     </div>

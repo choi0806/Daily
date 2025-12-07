@@ -1,3 +1,42 @@
+/* AI Feedback Section */
+.ai-feedback-section {
+  margin-top: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
+  border: 2px solid #ff6b35;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.15);
+}
+
+.ai-feedback-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #d84315;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-feedback-content {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #4a4a4a;
+  white-space: pre-wrap;
+}
+
+.ai-feedback-content p {
+  margin: 8px 0;
+}
+
+.ai-feedback-content p:first-child {
+  margin-top: 0;
+}
+
+.ai-feedback-content p:last-child {
+  margin-bottom: 0;
+}
+
 .team-snippet-modal {
   background-color: #fff;
   border-radius: 12px;
@@ -175,122 +214,9 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-.snippet-score {
-  display: flex;
-  align-items: center;
-}
+/* score-related styles removed */
 
-/* USR-002: AI ?�수 ?�시 ?��???*/
-.ai-score-display,
-.health-score-display {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.score-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: #ff6b35;
-  color: #ffffff;
-  padding: 12px 24px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
-  min-width: 90px;
-  justify-content: center;
-}
-
-.score-badge.health {
-  background: #ff6b35;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
-}
-
-.score-icon {
-  font-size: 18px;
-  line-height: 1;
-}
-
-.score-number {
-  font-size: 20px;
-  line-height: 1;
-  color: #ffffff;
-}
-
-.score-max {
-  font-size: 12px;
-  opacity: 0.9;
-  line-height: 1;
-  color: #ffffff;
-}
-
-/* AI 코멘???�션 */
-.ai-comments-section {
-  margin-top: 24px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border: 2px solid #0ea5e9;
-  border-radius: 12px;
-}
-
-.ai-comments-section h4 {
-  margin: 0 0 16px 0;
-  font-size: 15px;
-  color: #0369a1;
-  font-weight: 700;
-}
-
-.ai-comments {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.ai-comment {
-  margin: 0;
-  padding: 10px 14px;
-  background: white;
-  border-radius: 8px;
-  border-left: 4px solid #0ea5e9;
-  font-size: 13px;
-  color: #334155;
-  line-height: 1.5;
-}
-
-.score-breakdown-detail {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  padding-top: 16px;
-  border-top: 2px dashed #bae6fd;
-}
-
-.breakdown-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 12px 8px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.breakdown-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-}
-
-.breakdown-value {
-  font-size: 16px;
-  font-weight: 700;
-  color: #0369a1;
-}
+/* score-related styles removed */
 
 .snippet-header {
   display: flex;
@@ -301,11 +227,7 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
-.snippet-scores {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
+/* snippet scores removed */
 
 .snippet-header .user-info {
   display: flex;
@@ -503,40 +425,7 @@
   color: #333;
 }
 
-.teammate-scores {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.teammate-score {
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 12px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  border: 1px solid;
-}
-
-.teammate-score.ai {
-  color: #ffffff;
-  background: #ff6b35;
-  border-color: transparent;
-}
-
-.teammate-score.health {
-  color: #ffffff;
-  background: #ff6b35;
-  border-color: transparent;
-}
-
-.teammate-score .score-icon {
-  font-size: 14px;
-  line-height: 1;
-}
+/* teammate score styles removed */
 
 .teammate-preview {
   font-size: 12px;

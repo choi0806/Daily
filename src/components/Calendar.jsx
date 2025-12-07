@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import './Calendar.css';
 
 function Calendar({ onDateClick, snippets, schedules, tomorrowPlans, currentUser }) {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 9, 1)); // October 2025
+  // initialize to the user's current date so the calendar shows the latest month
+  const [currentDate, setCurrentDate] = useState(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  });
   const [viewMode, setViewMode] = useState('snippet'); // 'snippet' or 'schedule'
 
   const getDaysInMonth = (date) => {
@@ -26,7 +30,8 @@ function Calendar({ onDateClick, snippets, schedules, tomorrowPlans, currentUser
   };
 
   const goToToday = () => {
-    setCurrentDate(new Date(2025, 9, 18)); // October 18, 2025
+    const now = new Date();
+    setCurrentDate(new Date(now.getFullYear(), now.getMonth(), 1));
   };
 
   const daysInMonth = getDaysInMonth(currentDate);
@@ -50,28 +55,14 @@ function Calendar({ onDateClick, snippets, schedules, tomorrowPlans, currentUser
     const dateSchedules = schedules ? schedules[dateStr] : null;
     const scheduleCount = dateSchedules ? dateSchedules.reduce((total, user) => total + user.schedules.length, 0) : 0;
     
-    const isToday = day === 18 && currentDate.getMonth() === 9; // October 18
+    // check if this cell corresponds to today's date
+    const today = new Date();
+    const cellDateStr = dateStr; // YYYY-MM-DD
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const isToday = cellDateStr === todayStr;
 
-    // 날짜의 스니펫들의 점수 계산
-  const snippetScores = dateSnippets ? dateSnippets.map(s => {
-      // aiScore와 healthScore가 객체(total 필드 포함) 또는 숫자일 수 있음
-      const aiValue = typeof s.aiScore === 'object' ? (s.aiScore?.total || 0) : (s.aiScore || 0);
-      const healthValue = typeof s.healthScore === 'object' ? (s.healthScore?.total || 0) : (s.healthScore || 0);
-      // legacy 또는 저장된 총 점수(score) 우선 사용
-      const snippetValue = typeof s.score === 'number' ? s.score : aiValue;
-      return {
-        ai: aiValue,
-        health: healthValue,
-        score: snippetValue
-      };
-    }) : [];
-    const avgAiScore = snippetScores.length > 0 ? Math.round(snippetScores.reduce((sum, s) => sum + s.ai, 0) / snippetScores.length) : 0;
-    const avgHealthScore = snippetScores.length > 0 ? Math.round(snippetScores.reduce((sum, s) => sum + s.health, 0) / snippetScores.length * 10) / 10 : 0;
-    const avgSnippetScore = snippetScores.length > 0 ? Math.round(snippetScores.reduce((sum, s) => sum + s.score, 0) / snippetScores.length) : 0;
-  // 현재 사용자의 스니펫이 있으면 해당 사용자의 score/health를 우선 표시
-  const mySnippet = currentUser && dateSnippets ? dateSnippets.find(s => s.userId === currentUser.id) : null;
-  const displaySnippetScore = mySnippet ? (typeof mySnippet.score === 'number' ? mySnippet.score : (typeof mySnippet.aiScore === 'object' ? (mySnippet.aiScore?.total || 0) : (mySnippet.aiScore || 0))) : avgSnippetScore;
-  const displayHealthScore = mySnippet ? (typeof mySnippet.healthScore === 'object' ? (mySnippet.healthScore?.total || 0) : (mySnippet.healthScore ?? 0)) : avgHealthScore;
+    // 점수 관련 필드 제거: 대신 단순히 스니펫 개수만 표시합니다.
+    const mySnippet = currentUser && dateSnippets ? dateSnippets.find(s => s.userId === currentUser.id) : null;
 
     days.push(
       <div 
@@ -83,7 +74,7 @@ function Calendar({ onDateClick, snippets, schedules, tomorrowPlans, currentUser
         <div className="day-indicators">
           {viewMode === 'snippet' && snippetCount > 0 && (
             <div className="day-snippet-info">
-              <span className="snippet-score-text">스니펫: {displaySnippetScore} / 헬스: {displayHealthScore}</span>
+              <span className="snippet-count-text">스니펫 수: {snippetCount}</span>
             </div>
           )}
           {viewMode === 'schedule' && scheduleCount > 0 && (
@@ -125,15 +116,6 @@ function Calendar({ onDateClick, snippets, schedules, tomorrowPlans, currentUser
         </div>
 
         <div className="view-mode-tabs">
-          <button 
-            className={`view-mode-tab ${viewMode === 'schedule' ? 'active' : ''}`}
-            onClick={() => setViewMode('schedule')}
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-            </svg>
-            일정 확인
-          </button>
           <button 
             className={`view-mode-tab ${viewMode === 'snippet' ? 'active' : ''}`}
             onClick={() => setViewMode('snippet')}
