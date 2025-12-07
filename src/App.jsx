@@ -8,6 +8,8 @@ import TemplateEditor from './pages/TemplateEditor';
 import Login from './components/Login';
 import InitialSetup from './components/InitialSetup';
 import ChangePassword from './components/ChangePassword';
+import ManagerDashboard from './components/ManagerDashboard';
+import SuperAdminDashboard from './components/SuperAdminDashboard';
 
 // 현재 날짜를 가져오는 헬퍼 함수 (시스템 날짜 사용)
 const getTodayKST = () => {
@@ -19,7 +21,6 @@ const getTodayKST = () => {
   console.log('현재 시스템 날짜:', today, '시각:', now.toLocaleString('ko-KR'));
   return today;
 };
-import ManagerDashboard from './components/ManagerDashboard';
 import { 
   onAuthChange, 
   subscribeToUserData, 
@@ -587,8 +588,15 @@ function App() {
         onTemplateClick={handleTemplateClick}
       />
       
-      {/* 관리자인 경우 대시보드만 표시 */}
-      {userData?.isManager && currentPage === 'home' ? (
+      {/* 슈퍼 관리자인 경우 슈퍼 관리자 대시보드 표시 */}
+      {userData?.isSuperAdmin && currentPage === 'home' ? (
+        <SuperAdminDashboard
+          currentUser={currentUser}
+          userData={userData}
+          date={getTodayKST()}
+        />
+      ) : /* 관리자인 경우 대시보드만 표시 */
+      userData?.isManager && currentPage === 'home' ? (
         <ManagerDashboard
           currentUser={currentUser}
           userData={userData}

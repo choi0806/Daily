@@ -34,10 +34,8 @@ function Login() {
           <div className="form-group">
             <label htmlFor="userId">사용자 ID</label>
             <input
-              type="number"
+              type="text"
               id="userId"
-              min="1"
-              max="50"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               placeholder="1-50"

@@ -8,6 +8,7 @@ import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './config';
 
 // 사용자 조직 구조
+// ID 0: 슈퍼 관리자 (isSuperAdmin: true) - 모든 팀 관리
 // ID 1-5: 관리자 (isManager: true)
 // ID 6-14: 1번 관리자 팀 (개발팀)
 // ID 15-23: 2번 관리자 팀 (기획팀)
@@ -26,6 +27,18 @@ const TEAM_NAMES = {
 // 사용자 ID로 관리자 여부 및 팀 정보 계산
 export const getUserInfo = (userId) => {
   const id = parseInt(userId);
+  
+  // 슈퍼 관리자 (ID 0)
+  if (id === 0) {
+    return {
+      id: 0,
+      isManager: true,
+      isSuperAdmin: true,
+      managerId: null,
+      teamName: '전체 관리',
+      role: '슈퍼 관리자'
+    };
+  }
   
   if (id >= 1 && id <= 5) {
     return {
@@ -54,9 +67,15 @@ export const getUserInfo = (userId) => {
 // 로그인
 export const loginUser = async (userId, password) => {
   try {
-    const id = parseInt(userId);
-    if (id < 1 || id > 50) {
-      return { success: false, error: '유효하지 않은 사용자 ID입니다. (1-50)' };
+    // 특별 처리: "master" 입력 시 ID 0으로 변환
+    let id;
+    if (userId === 'master') {
+      id = 0;
+    } else {
+      id = parseInt(userId);
+      if (id < 1 || id > 50) {
+        return { success: false, error: '유효하지 않은 사용자 ID입니다. (0 또는 1-50)' };
+      }
     }
 
     const email = `user${id}@dailysnippet.com`;
