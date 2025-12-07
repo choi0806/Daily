@@ -1,20 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Calendar from './components/Calendar';
 import TeamSnippetView from './components/TeamSnippetView';
 import SnippetModal from './components/SnippetModal';
 import ScheduleView from './components/ScheduleView';
 import TemplateEditor from './pages/TemplateEditor';
+import Login from './components/Login';
+import InitialSetup from './components/InitialSetup';
+import ChangePassword from './components/ChangePassword';
+import ManagerDashboard from './components/ManagerDashboard';
+import { 
+  onAuthChange, 
+  subscribeToUserData, 
+  logoutUser,
+  saveSnippet,
+  getSnippetsByDate,
+  getTeamMemberSnippets,
+  toggleSnippetLike
+} from './firebase';
 import './App.css';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home'); // 'home', 'template', 'admin'
   
+  // Firebase 인증 상태
+  const [authUser, setAuthUser] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  
   const [currentUser, setCurrentUser] = useState({
-    id: 1,
-    name: '김유신/컴퓨터학회(컴퓨터학회전공)',
-    isLoggedIn: true,
-    isAdmin: true // 관리자 권한
+    id: null,
+    name: null,
+    isLoggedIn: false,
+    isAdmin: false
   });
 
   const [selectedDate, setSelectedDate] = useState(null);
@@ -176,27 +194,76 @@ function App() {
     ]
   });
 
-  const handleLogin = () => {
-    setCurrentUser({
-      id: 1,
-      name: '김유서/컴퓨터학회(컴퓨터학회전공)',
-      isLoggedIn: true
+  // Firebase 인증 상태 변화 감지
+  useEffect(() => {
+    const unsubscribeAuth = onAuthChange((user) => {
+      setAuthUser(user);
+      setAuthLoading(false);
+      
+      if (!user) {
+        setUserData(null);
+        setCurrentUser({
+          id: null,
+          name: null,
+          isLoggedIn: false,
+          isAdmin: false
+        });
+      }
     });
+
+    return () => unsubscribeAuth();
+  }, []);
+
+  // 사용자 데이터 구독
+  useEffect(() => {
+    if (!authUser) return;
+
+    const unsubscribeData = subscribeToUserData(authUser.uid, (data) => {
+      console.log('App.jsx 사용자 데이터 업데이트:', data);
+      setUserData(data);
+      
+      if (data && data.isInitialSetupComplete) {
+        console.log('초기 설정 완료, currentUser 업데이트');
+        setCurrentUser({
+          id: data.userId,
+          name: `${data.name}/${data.department}`,
+          isLoggedIn: true,
+          isAdmin: data.isManager || false,
+          ...data
+        });
+      }
+    });
+
+    return () => unsubscribeData();
+  }, [authUser]);
+
+  // 관리자인 경우 오늘 날짜의 팀원 스니펫 자동 로드
+  useEffect(() => {
+    if (userData?.isManager && currentUser?.id) {
+      const today = new Date().toISOString().split('T')[0];
+      setSelectedDate(today);
+      loadSnippetsForDate(today);
+    }
+  }, [userData?.isManager, currentUser?.id]);
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.error('로그아웃 오류:', error);
+    }
   };
 
-  const handleLogout = () => {
-    setCurrentUser({
-      id: null,
-      name: null,
-      isLoggedIn: false
-    });
-  };
-
-  const handleDateClick = (date, mode) => {
+  const handleDateClick = async (date, mode) => {
     setSelectedDate(date);
     setSelectedMode(mode);
     setShowWriteModal(false);
     setShowScheduleModal(false);
+    
+    // 스니펫 모드인 경우 해당 날짜의 스니펫 로드
+    if (mode === 'snippet') {
+      await loadSnippetsForDate(date);
+    }
   };
 
   const handleWriteSnippet = (date) => {
@@ -283,55 +350,88 @@ function App() {
     }
   };
 
-  const handleSaveSnippet = (date, snippetData) => {
-    // 현재 사용자의 스니펫 저장
-    const existingSnippets = teamSnippets[date] || [];
-    const userSnippetIndex = existingSnippets.findIndex(s => s.userId === currentUser.id);
-    const existingSnippet = userSnippetIndex >= 0 ? existingSnippets[userSnippetIndex] : null;
+  const handleSaveSnippet = async (date, snippetData) => {
+    try {
+      console.log('스니펫 저장 시작:', { date, snippetData, currentUser, userData });
+      
+      if (!currentUser?.id || !userData?.name) {
+        throw new Error('사용자 정보가 없습니다.');
+      }
 
-    const snippetTypeLabels = {
-      daily: 'Daily Snippet',
-      weekly: 'Weekly Snippet',
-      monthly: 'Monthly Snippet',
-      yearly: 'Yearly Snippet'
-    };
+      const snippetTypeLabels = {
+        daily: 'Daily Snippet',
+        weekly: 'Weekly Snippet',
+        monthly: 'Monthly Snippet',
+        yearly: 'Yearly Snippet'
+      };
 
-    const newSnippet = {
-      userId: currentUser.id,
-      userName: currentUser.name.split('/')[0],
-      userRole: currentUser.name.split('/')[1] || '',
-      date: new Date(date).toLocaleDateString('ko-KR', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      }),
-      snippetType: snippetData.snippetType || 'daily',
-      title: snippetTypeLabels[snippetData.snippetType || 'daily'],
-      content: snippetData.content,
-      feedback: snippetData.feedback || existingSnippet?.feedback || '', // AI 피드백 저장
-      tags: [],
-      likes: existingSnippet?.likes || 0,
-      likedBy: existingSnippet?.likedBy || []
-    };
+      // Firebase에 저장할 데이터
+      const snippetToSave = {
+        userId: currentUser.id,
+        userName: userData.name,
+        userRole: userData.department || '미지정',
+        managerId: userData.managerId || null,
+        isManager: userData.isManager || false,
+        snippetType: snippetData.snippetType || 'daily',
+        title: snippetTypeLabels[snippetData.snippetType || 'daily'],
+        content: snippetData.content,
+        feedback: snippetData.feedback || '',
+        tags: [],
+        likes: 0,
+        likedBy: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
 
-    if (userSnippetIndex >= 0) {
-      // 기존 스니펫 업데이트
-      existingSnippets[userSnippetIndex] = newSnippet;
-    } else {
-      // 새 스니펫 추가
-      existingSnippets.push(newSnippet);
+      console.log('Firebase에 저장할 데이터:', snippetToSave);
+
+      // Firebase에 저장
+      await saveSnippet(currentUser.id, date, snippetToSave);
+      
+      console.log('Firebase 저장 완료');
+
+      // 로컬 상태 업데이트를 위해 스니펫 다시 로드
+      await loadSnippetsForDate(date);
+      
+      console.log('스니펫 로드 완료');
+      
+      // 모달 닫기
+      setShowWriteModal(false);
+    } catch (error) {
+      console.error('스니펫 저장 오류:', error);
+      alert('스니펫 저장에 실패했습니다: ' + error.message);
     }
+  };
 
-    setTeamSnippets({
-      ...teamSnippets,
-      [date]: existingSnippets
-    });
+  // 특정 날짜의 스니펫 로드
+  const loadSnippetsForDate = async (date) => {
+    try {
+      console.log('스니펫 로드 시작:', date, 'isManager:', userData?.isManager, 'managerId:', userData?.managerId);
+      let result;
+      
+      // 관리자인 경우 팀원 스니펫 가져오기
+      if (userData?.isManager) {
+        result = await getTeamMemberSnippets(currentUser.id, date);
+      } else {
+        // 일반 사용자는 같은 팀 스니펫만 가져오기
+        result = await getSnippetsByDate(date, userData?.managerId);
+      }
 
-    // snippets state used by Calendar expects an array of snippets for the date
-    setSnippets({
-      ...snippets,
-      [date]: existingSnippets
-    });
+      const snippetsData = result.success ? result.data : [];
+      console.log('로드된 스니펫:', snippetsData);
+
+      setTeamSnippets(prev => ({
+        ...prev,
+        [date]: snippetsData
+      }));
+
+      setSnippets(prev => ({
+        ...prev,
+        [date]: snippetsData
+      }));
+    } catch (error) {
+      console.error('스니펫 로드 오류:', error);
+    }
   };
 
   const handleCloseTeamView = () => {
@@ -372,30 +472,41 @@ function App() {
     return userSchedule ? userSchedule.schedules : [];
   };
 
-  const handleToggleLike = (date, snippetUserId) => {
-    const dateSnippets = teamSnippets[date];
-    if (!dateSnippets) return;
+  const handleToggleLike = async (date, snippetUserId) => {
+    try {
+      const dateSnippets = teamSnippets[date];
+      if (!dateSnippets) return;
 
-    const updatedSnippets = dateSnippets.map(snippet => {
-      if (snippet.userId === snippetUserId) {
-        const likedBy = snippet.likedBy || [];
-        const hasLiked = likedBy.includes(currentUser.id);
-        
-        return {
-          ...snippet,
-          likes: hasLiked ? (snippet.likes || 1) - 1 : (snippet.likes || 0) + 1,
-          likedBy: hasLiked 
-            ? likedBy.filter(id => id !== currentUser.id)
-            : [...likedBy, currentUser.id]
-        };
-      }
-      return snippet;
-    });
+      const snippet = dateSnippets.find(s => s.userId === snippetUserId);
+      if (!snippet) return;
 
-    setTeamSnippets({
-      ...teamSnippets,
-      [date]: updatedSnippets
-    });
+      const likedBy = snippet.likedBy || [];
+      const hasLiked = likedBy.includes(currentUser.id);
+
+      // Firebase에 좋아요 토글
+      await toggleSnippetLike(snippetUserId, date, currentUser.id, hasLiked);
+
+      // 로컬 상태 업데이트
+      const updatedSnippets = dateSnippets.map(s => {
+        if (s.userId === snippetUserId) {
+          return {
+            ...s,
+            likes: hasLiked ? (s.likes || 1) - 1 : (s.likes || 0) + 1,
+            likedBy: hasLiked 
+              ? likedBy.filter(id => id !== currentUser.id)
+              : [...likedBy, currentUser.id]
+          };
+        }
+        return s;
+      });
+
+      setTeamSnippets({
+        ...teamSnippets,
+        [date]: updatedSnippets
+      });
+    } catch (error) {
+      console.error('좋아요 토글 오류:', error);
+    }
   };
 
   const handleTemplateClick = () => {
@@ -416,31 +527,80 @@ function App() {
     );
   }
 
+  // 로딩 중
+  if (authLoading) {
+    return (
+      <div className="app" style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '1.2rem',
+        color: '#666'
+      }}>
+        로딩 중...
+      </div>
+    );
+  }
+
+  // 로그인하지 않은 경우
+  if (!authUser) {
+    return <Login />;
+  }
+
+  // 초기 설정이 완료되지 않은 경우
+  if (userData && !userData.isInitialSetupComplete) {
+    return <InitialSetup currentUser={authUser} />;
+  }
+
+  // 비밀번호 변경이 필요한 경우
+  if (userData && !userData.passwordChanged) {
+    return (
+      <ChangePassword 
+        currentUser={authUser}
+        onPasswordChanged={() => {
+          // 비밀번호 변경 후 userData를 다시 로드하여 UI 업데이트
+          setUserData({ ...userData, passwordChanged: true });
+        }}
+      />
+    );
+  }
+
   // 메인 페이지 렌더링
   return (
     <div className="app">
       <Header 
         user={currentUser}
-        onLogin={handleLogin}
         onLogout={handleLogout}
         onTemplateClick={handleTemplateClick}
       />
       
-      <div className="main-content">
-        <div className="calendar-section">
-          <Calendar 
-            onDateClick={handleDateClick}
-            snippets={teamSnippets}
-            schedules={teamSchedules}
-            tomorrowPlans={tomorrowPlans}
-            currentUser={currentUser}
-          />
+      {/* 관리자인 경우 대시보드만 표시 */}
+      {userData?.isManager && currentPage === 'home' ? (
+        <ManagerDashboard
+          currentUser={currentUser}
+          userData={userData}
+          date={selectedDate || new Date().toISOString().split('T')[0]}
+          teamSnippets={selectedDate ? (teamSnippets[selectedDate] || []) : []}
+        />
+      ) : currentPage === 'home' ? (
+        <div className="main-content">
+          <div className="calendar-section">
+            <Calendar 
+              onDateClick={handleDateClick}
+              snippets={teamSnippets}
+              schedules={teamSchedules}
+              tomorrowPlans={tomorrowPlans}
+              currentUser={currentUser}
+            />
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {/* AI 챗봇 UI 제거 */}
 
-      {selectedDate && selectedMode === 'snippet' && !showWriteModal && (
+      {/* 일반 사용자만 스니펫 작성/조회 가능 */}
+      {!userData?.isManager && selectedDate && selectedMode === 'snippet' && !showWriteModal && (
         <TeamSnippetView
           date={selectedDate}
           teamSnippets={teamSnippets[selectedDate] || []}
@@ -451,7 +611,7 @@ function App() {
         />
       )}
 
-      {selectedDate && selectedMode === 'schedule' && !showScheduleModal && (
+      {!userData?.isManager && selectedDate && selectedMode === 'schedule' && !showScheduleModal && (
         <ScheduleView
           selectedDate={selectedDate}
           schedules={getUserSchedules(selectedDate)}
@@ -464,7 +624,8 @@ function App() {
         />
       )}
 
-      {showWriteModal && selectedDate && (
+      {/* 일반 사용자만 스니펫 작성 가능 */}
+      {!userData?.isManager && showWriteModal && selectedDate && (
         <SnippetModal
           date={selectedDate}
           snippet={getCurrentUserSnippet(selectedDate)}

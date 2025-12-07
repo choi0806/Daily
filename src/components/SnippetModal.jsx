@@ -114,36 +114,42 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
       return;
     }
 
-    // AI 피드백 생성 시작 (백그라운드에서 진행)
-    setIsGeneratingFeedback(true);
-    
-    // 먼저 스니펫을 저장 (피드백 없이)
-    onSave(date, { 
-      snippetType, 
-      content,
-      feedback: '', // 일단 빈 피드백으로 저장
-      submittedAt: new Date().toISOString()
-    });
-
-    // 모달을 먼저 닫음
-    if (closeAfter) {
-      onClose();
-    }
-
-    // 백그라운드에서 AI 피드백 생성 후 다시 저장
     try {
-      const feedback = await generateSnippetFeedback(content, '사용자');
-      // 피드백이 생성되면 다시 저장하여 업데이트
-      onSave(date, { 
+      // AI 피드백 생성 시작 (백그라운드에서 진행)
+      setIsGeneratingFeedback(true);
+      
+      // 먼저 스니펫을 저장 (피드백 없이)
+      await onSave(date, { 
         snippetType, 
         content,
-        feedback,
+        feedback: '', // 일단 빈 피드백으로 저장
         submittedAt: new Date().toISOString()
       });
+
+      // 모달을 먼저 닫음
+      if (closeAfter) {
+        onClose();
+      }
+
+      // 백그라운드에서 AI 피드백 생성 후 다시 저장
+      try {
+        const feedback = await generateSnippetFeedback(content, '사용자');
+        // 피드백이 생성되면 다시 저장하여 업데이트
+        await onSave(date, { 
+          snippetType, 
+          content,
+          feedback,
+          submittedAt: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error('피드백 생성 실패:', error);
+        // 실패해도 스니펫은 이미 저장되었으므로 문제없음
+      } finally {
+        setIsGeneratingFeedback(false);
+      }
     } catch (error) {
-      console.error('피드백 생성 실패:', error);
-      // 실패해도 스니펫은 이미 저장되었으므로 문제없음
-    } finally {
+      console.error('스니펫 저장 오류:', error);
+      alert('스니펫 저장에 실패했습니다: ' + error.message);
       setIsGeneratingFeedback(false);
     }
   };
