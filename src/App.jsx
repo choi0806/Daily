@@ -402,13 +402,38 @@ function App() {
       
       console.log('Firebase 저장 완료');
 
-      // 로컬 상태 업데이트를 위해 스니펫 다시 로드
-      await loadSnippetsForDate(date);
-      
-      console.log('스니펫 로드 완료');
-      
-      // 모달 닫기
+      // 모달 먼저 닫기
       setShowWriteModal(false);
+      
+      // 즉시 로컬 상태 업데이트 (낙관적 업데이트)
+      const updatedSnippet = {
+        ...snippetToSave,
+        id: `${currentUser.id}_${date}`,
+        date: date
+      };
+      
+      // snippets 상태 업데이트
+      setSnippets(prev => ({
+        ...prev,
+        [date]: prev[date] 
+          ? prev[date].map(s => s.userId === currentUser.id ? updatedSnippet : s)
+          : [updatedSnippet]
+      }));
+      
+      // teamSnippets 상태도 업데이트
+      setTeamSnippets(prev => ({
+        ...prev,
+        [date]: prev[date]
+          ? prev[date].map(s => s.userId === currentUser.id ? updatedSnippet : s)
+          : [updatedSnippet]
+      }));
+      
+      console.log('로컬 상태 즉시 업데이트 완료');
+      
+      // 백그라운드에서 Firebase에서 다시 로드 (검증용)
+      setTimeout(() => {
+        loadSnippetsForDate(date);
+      }, 500);
     } catch (error) {
       console.error('스니펫 저장 오류:', error);
       alert('스니펫 저장에 실패했습니다: ' + error.message);
@@ -590,7 +615,7 @@ function App() {
           <div className="calendar-section">
             <Calendar 
               onDateClick={handleDateClick}
-              snippets={teamSnippets}
+              snippets={userData?.isManager ? teamSnippets : snippets}
               schedules={teamSchedules}
               tomorrowPlans={tomorrowPlans}
               currentUser={currentUser}

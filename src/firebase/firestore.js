@@ -16,15 +16,28 @@ import { db } from './config';
 export const saveSnippet = async (userId, date, snippetData) => {
   try {
     const snippetId = `${userId}_${date}`;
-    await setDoc(doc(db, 'snippets', snippetId), {
+    const now = new Date().toISOString();
+    
+    console.log('firestore.js saveSnippet 호출:', { snippetId, userId, date });
+    console.log('저장할 데이터:', snippetData);
+    
+    const dataToSave = {
       userId,
       date,
       ...snippetData,
-      timestamp: new Date().toISOString(),
-      likes: []
-    }, { merge: true });
+      timestamp: now,
+      updatedAt: now, // 수정 시간 명시적으로 업데이트
+      likes: snippetData.likes || []
+    };
+    
+    console.log('최종 저장 데이터:', dataToSave);
+    
+    await setDoc(doc(db, 'snippets', snippetId), dataToSave, { merge: true });
+    
+    console.log('Firebase 저장 성공:', snippetId);
     return { success: true };
   } catch (error) {
+    console.error('Firebase 저장 실패:', error);
     return { success: false, error: error.message };
   }
 };

@@ -62,11 +62,17 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
   const [content, setContent] = useState(snippet?.content || '');
   // 타임어택 관련 상태: 시간, 활성화, 그리고 타임업 시 입력 잠금
   const [timeLeft, setTimeLeft] = useState(300); // 5분 = 300초
-  const [isTimeAttack, setIsTimeAttack] = useState(timeAttackMode);
+  // 기존 스니펫 수정 시에는 타임어택 비활성화
+  const [isTimeAttack, setIsTimeAttack] = useState(snippet ? false : timeAttackMode);
   const [isLocked, setIsLocked] = useState(false);
 
   useEffect(() => {
     setContent(snippet?.content || '');
+    // 기존 스니펫을 수정하는 경우 타임어택 모드 해제 및 잠금 해제
+    if (snippet) {
+      setIsTimeAttack(false);
+      setIsLocked(false);
+    }
   }, [snippet]);
 
   // USR-005: 타임어택 타이머

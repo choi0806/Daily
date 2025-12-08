@@ -120,6 +120,30 @@
   margin-top: 4px;
 }
 
+/* 주간/월간 사용자별 그룹 */
+.user-snippets-group {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.user-group-header {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.user-snippets-group .snippet-card {
+  margin-bottom: 15px;
+  margin-left: 20px;
+  border-left: 4px solid #667eea;
+}
+
 .section-title {
   font-size: 24px;
   font-weight: 700;

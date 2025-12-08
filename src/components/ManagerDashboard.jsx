@@ -213,8 +213,10 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
     // AI 요약은 버튼 클릭 시에만 생성 (자동 생성 제거)
   }, [periodSnippets, teamSnippets, currentUser.id]);
 
-  const generateAISummary = async (snippets) => {
-    console.log('🔄 AI 요약 버튼 클릭됨. 스니펫 수:', snippets.length);
+  const generateAISummary = async () => {
+    // 현재 보기 모드에 따라 적절한 스니펫 사용
+    const snippets = periodSnippets.length > 0 ? periodSnippets : teamSnippets;
+    console.log('🔄 AI 요약 버튼 클릭됨. 스니펫 수:', snippets.length, '모드:', viewMode);
     
     if (!snippets || snippets.length === 0) {
       alert('팀원의 스니펫이 없습니다.');
@@ -225,7 +227,8 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
     try {
       console.log('AI 요약 생성 시작:', { 
         snippetsCount: snippets.length, 
-        teamName: userData?.teamName 
+        teamName: userData?.teamName,
+        viewMode: viewMode
       });
       
       const summary = await generateTeamSummary(snippets, userData?.teamName || '팀');
@@ -470,10 +473,10 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
               {!isLoadingSummary && (
                 <button 
                   className="btn-generate-summary"
-                  onClick={() => generateAISummary(teamSnippets)}
-                  disabled={teamSnippets.length === 0}
+                  onClick={generateAISummary}
+                  disabled={(periodSnippets.length === 0 && teamSnippets.length === 0)}
                 >
-                  🔄 AI 요약 생성
+                  🔄 {viewMode === 'daily' ? '일간' : viewMode === 'weekly' ? '주간' : '월간'} AI 요약 생성
                 </button>
               )}
             </div>
@@ -613,7 +616,24 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
           </div>
         ) : (periodSnippets.length > 0 || teamSnippets.length > 0) ? (
           <div className="snippets-grid">
-            {(periodSnippets.length > 0 ? periodSnippets : teamSnippets).map((snippet, idx) => (
+            {(() => {
+              const snippetsToDisplay = periodSnippets.length > 0 ? periodSnippets : teamSnippets;
+              
+              // 주간/월간 모드: 이름별로 그룹화
+              if (viewMode !== 'daily' && periodSnippets.length > 0) {
+                const groupedByUser = {};
+                snippetsToDisplay.forEach(snippet => {
+                  const userName = snippet.userName || '이름 없음';
+                  if (!groupedByUser[userName]) {
+                    groupedByUser[userName] = [];
+                  }
+                  groupedByUser[userName].push(snippet);
+                });
+
+                return Object.entries(groupedByUser).map(([userName, userSnippets]) => (
+                  <div key={userName} className="user-snippets-group">
+                    <h4 className="user-group-header">👤 {userName} ({userSnippets.length}개)</h4>
+                    {userSnippets.map((snippet, idx) => (
               <div key={`${snippet.userId}_${snippet.date}_${idx}`} className="snippet-card">
                 <div className="snippet-header">
                   <div className="user-info">
@@ -689,7 +709,90 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
                   </div>
                 </div>
               </div>
-            ))}
+                    ))}
+                  </div>
+                ));
+              }
+              
+              // 일간 모드: 일반 표시
+              return snippetsToDisplay.map((snippet, idx) => (
+              <div key={`${snippet.userId}_${snippet.date}_${idx}`} className="snippet-card">
+                <div className="snippet-header">
+                  <div className="user-info">
+                    <div className="user-avatar">
+                      {snippet.userName?.charAt(0) || '?'}
+                    </div>
+                    <div className="user-details">
+                      <h4>{snippet.userName || '이름 없음'}</h4>
+                      <p>{snippet.userRole || '부서 미지정'}</p>
+                      {viewMode !== 'daily' && (
+                        <span className="snippet-date">📅 {snippet.date}</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="snippet-meta">
+                    <span className="snippet-type">{snippet.snippetType || 'daily'}</span>
+                  </div>
+                </div>
+                <div className="snippet-content">
+                  <div className="content-section">
+                    <strong>📝 작성 내용:</strong>
+                    <p>{snippet.content || '내용 없음'}</p>
+                  </div>
+                  {snippet.accomplishments && snippet.accomplishments.length > 0 && (
+                    <div className="content-section">
+                      <strong>✅ 성과:</strong>
+                      <ul>
+                        {snippet.accomplishments.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {snippet.todoList && snippet.todoList.length > 0 && (
+                    <div className="content-section">
+                      <strong>📋 할 일:</strong>
+                      <ul>
+                        {snippet.todoList.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {/* 팀장 피드백 섹션 */}
+                <div className="manager-feedback-section">
+                  <strong>💬 팀장 피드백:</strong>
+                  <textarea
+                    className="feedback-textarea"
+                    value={feedbackInputs[`${snippet.userId}_${snippet.date}`] || ''}
+                    onChange={(e) => handleFeedbackChange(snippet.userId, snippet.date, e.target.value)}
+                    placeholder="팀원에게 피드백을 작성해주세요..."
+                    rows="3"
+                  />
+                  <button
+                    className="btn-save-feedback"
+                    onClick={() => handleSaveFeedback(snippet)}
+                    disabled={savingFeedback[`${snippet.userId}_${snippet.date}`]}
+                  >
+                    {savingFeedback[`${snippet.userId}_${snippet.date}`] ? '저장 중...' : '피드백 저장'}
+                  </button>
+                </div>
+
+                <div className="snippet-footer">
+                  <div className="snippet-stats">
+                    <span className="likes">
+                      👍 {snippet.likes?.length || 0}
+                    </span>
+                    <span className="time">
+                      {snippet.timestamp ? new Date(snippet.timestamp).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : ''}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              ));
+            })()}
           </div>
         ) : (
           <div className="no-snippets">
