@@ -127,3 +127,19 @@ export const getUserSnippets = async (userId, startDate, endDate) => {
     return { success: false, error: error.message };
   }
 };
+
+// 팀장 피드백 저장
+export const saveManagerFeedback = async (userId, date, feedback) => {
+  try {
+    const snippetId = `${userId}_${date}`;
+    await setDoc(doc(db, 'snippets', snippetId), {
+      managerFeedback: feedback,
+      feedbackUpdatedAt: new Date().toISOString()
+    }, { merge: true });
+    
+    return { success: true };
+  } catch (error) {
+    console.error('피드백 저장 오류:', error);
+    return { success: false, error: error.message };
+  }
+};

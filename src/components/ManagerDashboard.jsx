@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { generateTeamSummary } from '../lib/geminiSummary';
+import { saveManagerFeedback } from '../firebase/firestore';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import './ManagerDashboard.css';
 
 function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
+  const [viewMode, setViewMode] = useState('daily'); // 'daily', 'weekly', 'monthly'
+  const [selectedDate, setSelectedDate] = useState(date);
+  const [selectedWeek, setSelectedWeek] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [periodSnippets, setPeriodSnippets] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const [stats, setStats] = useState({
     completionRate: 0,
     totalMembers: 9,
@@ -32,27 +42,176 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
   });
 
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
+  const [feedbackInputs, setFeedbackInputs] = useState({}); // 각 스니펫별 피드백 입력 상태
+  const [savingFeedback, setSavingFeedback] = useState({}); // 저장 중 상태
+
+  // 주차 계산 함수
+  const getWeekNumber = (date) => {
+    const d = new Date(date);
+    const firstDayOfYear = new Date(d.getFullYear(), 0, 1);
+    const pastDaysOfYear = (d - firstDayOfYear) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+  };
+
+  // 주차 범위 계산
+  const getWeekRange = (year, week) => {
+    const firstDayOfYear = new Date(year, 0, 1);
+    const daysOffset = (week - 1) * 7;
+    const weekStart = new Date(firstDayOfYear.getTime() + daysOffset * 86400000);
+    
+    // 주의 시작을 월요일로 조정
+    const dayOfWeek = weekStart.getDay();
+    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    weekStart.setDate(weekStart.getDate() + diff);
+    
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    
+    return {
+      start: weekStart.toISOString().split('T')[0],
+      end: weekEnd.toISOString().split('T')[0]
+    };
+  };
+
+  // 기간별 스니펫 로드
+  const loadPeriodSnippets = async () => {
+    setLoading(true);
+    try {
+      let startDate, endDate;
+
+      if (viewMode === 'daily') {
+        startDate = endDate = selectedDate;
+        // 일간 모드: 정확한 날짜 매칭 (인덱스 불필요)
+        const snippetsQuery = query(
+          collection(db, 'snippets'),
+          where('managerId', '==', currentUser.id),
+          where('date', '==', selectedDate)
+        );
+        
+        const snapshot = await getDocs(snippetsQuery);
+        const snippetsData = [];
+        snapshot.forEach((doc) => {
+          snippetsData.push({ id: doc.id, ...doc.data() });
+        });
+
+        // 클라이언트 측 정렬
+        snippetsData.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+        console.log('로드된 스니펫:', snippetsData.length, '개');
+        setPeriodSnippets(snippetsData);
+        setLoading(false);
+        return;
+      } else if (viewMode === 'weekly' && selectedWeek) {
+        const [year, week] = selectedWeek.split('-W');
+        const range = getWeekRange(parseInt(year), parseInt(week));
+        startDate = range.start;
+        endDate = range.end;
+      } else if (viewMode === 'monthly' && selectedMonth) {
+        const [year, month] = selectedMonth.split('-');
+        startDate = `${year}-${month}-01`;
+        const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
+        endDate = `${year}-${month}-${lastDay}`;
+      } else {
+        setPeriodSnippets([]);
+        setLoading(false);
+        return;
+      }
+
+      console.log('스니펫 로드:', { viewMode, startDate, endDate, managerId: currentUser.id });
+
+      const snippetsQuery = query(
+        collection(db, 'snippets'),
+        where('managerId', '==', currentUser.id),
+        where('date', '>=', startDate),
+        where('date', '<=', endDate)
+        // 인덱스 생성 완료 후 아래 주석 해제
+        // orderBy('date', 'desc'),
+        // orderBy('timestamp', 'desc')
+      );
+
+      const snapshot = await getDocs(snippetsQuery);
+      const snippetsData = [];
+      snapshot.forEach((doc) => {
+        snippetsData.push({ id: doc.id, ...doc.data() });
+      });
+
+      // 클라이언트 측 정렬 (인덱스 생성 전까지)
+      snippetsData.sort((a, b) => {
+        if (b.date !== a.date) return b.date.localeCompare(a.date);
+        return (b.timestamp || 0) - (a.timestamp || 0);
+      });
+
+      console.log('로드된 스니펫:', snippetsData.length, '개');
+      setPeriodSnippets(snippetsData);
+    } catch (error) {
+      console.error('스니펫 로드 오류:', error);
+      alert('스니펫을 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!teamSnippets) return;
+    // 초기 날짜 설정
+    if (viewMode === 'daily') {
+      setSelectedDate(date);
+    } else if (viewMode === 'weekly') {
+      const now = new Date();
+      const year = now.getFullYear();
+      const week = getWeekNumber(now);
+      setSelectedWeek(`${year}-W${String(week).padStart(2, '0')}`);
+    } else if (viewMode === 'monthly') {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      setSelectedMonth(`${year}-${month}`);
+    }
+  }, [viewMode, date]);
 
-    // 작성률 계산
-    const completed = teamSnippets.length;
-    const total = 9; // 팀원 9명
-    const rate = total > 0 ? ((completed / total) * 100).toFixed(1) : 0;
+  useEffect(() => {
+    loadPeriodSnippets();
+  }, [viewMode, selectedDate, selectedWeek, selectedMonth, currentUser.id]);
+
+  useEffect(() => {
+    const snippetsToAnalyze = periodSnippets.length > 0 ? periodSnippets : teamSnippets;
+    if (!snippetsToAnalyze || snippetsToAnalyze.length === 0) return;
+
+    // 팀원 수 계산 (관리자 ID에 따라 다름)
+    let totalMembers = 10; // 기본값 (피플파트너팀)
+    if (currentUser.id === 12) {
+      totalMembers = 5; // HRBP팀
+    } else if (currentUser.id === 18) {
+      totalMembers = 7; // 안전보건팀
+    } else if (currentUser.isSuperAdmin || currentUser.isMasterAccount) {
+      // 마스터 계정은 전체 팀원 수
+      totalMembers = 22; // 10 + 5 + 7
+    }
+
+    // 기간별로 고유 사용자 수 계산
+    const uniqueUsers = new Set(snippetsToAnalyze.map(s => s.userId));
+    const completed = uniqueUsers.size;
+    const rate = totalMembers > 0 ? ((completed / totalMembers) * 100).toFixed(1) : 0;
 
     setStats({
       completionRate: parseFloat(rate),
-      totalMembers: total,
+      totalMembers: totalMembers,
       completedMembers: completed,
-      pendingMembers: total - completed
+      pendingMembers: totalMembers - completed
     });
 
     // 인사이트 분석
-    analyzeInsights(teamSnippets);
+    analyzeInsights(snippetsToAnalyze);
+
+    // 피드백 입력 상태 초기화 (기존 피드백이 있으면 표시)
+    const initialFeedbacks = {};
+    snippetsToAnalyze.forEach(snippet => {
+      const key = `${snippet.userId}_${snippet.date}`;
+      initialFeedbacks[key] = snippet.managerFeedback || '';
+    });
+    setFeedbackInputs(initialFeedbacks);
 
     // AI 요약은 버튼 클릭 시에만 생성 (자동 생성 제거)
-  }, [teamSnippets]);
+  }, [periodSnippets, teamSnippets, currentUser.id]);
 
   const generateAISummary = async (snippets) => {
     console.log('🔄 AI 요약 버튼 클릭됨. 스니펫 수:', snippets.length);
@@ -125,6 +284,41 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
       .map(([word]) => word);
   };
 
+  const handleFeedbackChange = (userId, snippetDate, value) => {
+    const key = `${userId}_${snippetDate}`;
+    setFeedbackInputs(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const handleSaveFeedback = async (snippet) => {
+    const key = `${snippet.userId}_${snippet.date}`;
+    const feedback = feedbackInputs[key];
+    if (!feedback || !feedback.trim()) {
+      alert('피드백을 입력해주세요.');
+      return;
+    }
+
+    setSavingFeedback(prev => ({ ...prev, [key]: true }));
+
+    try {
+      const result = await saveManagerFeedback(snippet.userId, snippet.date, feedback);
+      if (result.success) {
+        alert('피드백이 저장되었습니다.');
+        // 스니펫 데이터 새로고침
+        await loadPeriodSnippets();
+      } else {
+        alert('피드백 저장 실패: ' + result.error);
+      }
+    } catch (error) {
+      console.error('피드백 저장 오류:', error);
+      alert('피드백 저장 중 오류가 발생했습니다.');
+    } finally {
+      setSavingFeedback(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
   const analyzeInsights = (snippets) => {
     if (!snippets || snippets.length === 0) return;
 
@@ -169,6 +363,57 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
       <div className="dashboard-header">
         <h2>{userData?.teamName} 대시보드</h2>
         <p className="dashboard-date">{date}</p>
+      </div>
+
+      {/* 기간 선택 섹션 */}
+      <div className="period-selector-section">
+        <div className="view-mode-tabs">
+          <button 
+            className={`mode-tab ${viewMode === 'daily' ? 'active' : ''}`}
+            onClick={() => setViewMode('daily')}
+          >
+            일간
+          </button>
+          <button 
+            className={`mode-tab ${viewMode === 'weekly' ? 'active' : ''}`}
+            onClick={() => setViewMode('weekly')}
+          >
+            주간
+          </button>
+          <button 
+            className={`mode-tab ${viewMode === 'monthly' ? 'active' : ''}`}
+            onClick={() => setViewMode('monthly')}
+          >
+            월간
+          </button>
+        </div>
+
+        <div className="date-selector">
+          {viewMode === 'daily' && (
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="date-input"
+            />
+          )}
+          {viewMode === 'weekly' && (
+            <input
+              type="week"
+              value={selectedWeek}
+              onChange={(e) => setSelectedWeek(e.target.value)}
+              className="date-input"
+            />
+          )}
+          {viewMode === 'monthly' && (
+            <input
+              type="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="date-input"
+            />
+          )}
+        </div>
       </div>
 
       {/* 대시보드 섹션 */}
@@ -355,11 +600,21 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
 
       {/* 팀원 스니펫 카드 */}
       <div className="team-snippets-section">
-        <h3 className="section-title">팀원 Daily Snippets</h3>
-        <div className="snippets-grid">
-          {teamSnippets && teamSnippets.length > 0 ? (
-            teamSnippets.map((snippet, idx) => (
-              <div key={idx} className="snippet-card">
+        <h3 className="section-title">
+          {viewMode === 'daily' && '팀원 Daily Snippets'}
+          {viewMode === 'weekly' && '팀원 Weekly Snippets'}
+          {viewMode === 'monthly' && '팀원 Monthly Snippets'}
+        </h3>
+        
+        {loading ? (
+          <div className="loading-section">
+            <div className="spinner"></div>
+            <p>스니펫을 불러오는 중...</p>
+          </div>
+        ) : (periodSnippets.length > 0 || teamSnippets.length > 0) ? (
+          <div className="snippets-grid">
+            {(periodSnippets.length > 0 ? periodSnippets : teamSnippets).map((snippet, idx) => (
+              <div key={`${snippet.userId}_${snippet.date}_${idx}`} className="snippet-card">
                 <div className="snippet-header">
                   <div className="user-info">
                     <div className="user-avatar">
@@ -368,6 +623,9 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
                     <div className="user-details">
                       <h4>{snippet.userName || '이름 없음'}</h4>
                       <p>{snippet.userRole || '부서 미지정'}</p>
+                      {viewMode !== 'daily' && (
+                        <span className="snippet-date">📅 {snippet.date}</span>
+                      )}
                     </div>
                   </div>
                   <div className="snippet-meta">
@@ -400,6 +658,26 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
                     </div>
                   )}
                 </div>
+
+                {/* 팀장 피드백 섹션 */}
+                <div className="manager-feedback-section">
+                  <strong>💬 팀장 피드백:</strong>
+                  <textarea
+                    className="feedback-textarea"
+                    value={feedbackInputs[`${snippet.userId}_${snippet.date}`] || ''}
+                    onChange={(e) => handleFeedbackChange(snippet.userId, snippet.date, e.target.value)}
+                    placeholder="팀원에게 피드백을 작성해주세요..."
+                    rows="3"
+                  />
+                  <button
+                    className="btn-save-feedback"
+                    onClick={() => handleSaveFeedback(snippet)}
+                    disabled={savingFeedback[`${snippet.userId}_${snippet.date}`]}
+                  >
+                    {savingFeedback[`${snippet.userId}_${snippet.date}`] ? '저장 중...' : '피드백 저장'}
+                  </button>
+                </div>
+
                 <div className="snippet-footer">
                   <div className="snippet-stats">
                     <span className="likes">
@@ -411,13 +689,13 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
                   </div>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="no-snippets">
-              <p>아직 작성된 스니펫이 없습니다.</p>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="no-snippets">
+            <p>선택한 기간에 작성된 스니펫이 없습니다.</p>
+          </div>
+        )}
       </div>
     </div>
   );

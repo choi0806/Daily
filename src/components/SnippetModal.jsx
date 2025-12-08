@@ -59,16 +59,13 @@ Tomorrow (내일 할 일)`
 ];
 
 function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }) {
-  const [snippetType, setSnippetType] = useState(snippet?.snippetType || 'daily');
   const [content, setContent] = useState(snippet?.content || '');
-  const [showTemplates, setShowTemplates] = useState(false);
   // 타임어택 관련 상태: 시간, 활성화, 그리고 타임업 시 입력 잠금
   const [timeLeft, setTimeLeft] = useState(300); // 5분 = 300초
   const [isTimeAttack, setIsTimeAttack] = useState(timeAttackMode);
   const [isLocked, setIsLocked] = useState(false);
 
   useEffect(() => {
-    setSnippetType(snippet?.snippetType || 'daily');
     setContent(snippet?.content || '');
   }, [snippet]);
 
@@ -113,7 +110,7 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
 
     try {
       await onSave(date, { 
-        snippetType, 
+        snippetType: 'daily',
         content,
         submittedAt: new Date().toISOString()
       });
@@ -124,25 +121,11 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
     } catch (error) {
       console.error('스니펫 저장 오류:', error);
       alert('스니펫 저장에 실패했습니다: ' + error.message);
-      setIsGeneratingFeedback(false);
     }
   };
 
 
-  const handleTemplateSelect = (template) => {
-    setContent(template.content);
-    setShowTemplates(false);
-  };
 
-  const getSnippetTypeLabel = (type) => {
-    const labels = {
-      daily: 'Daily Snippet',
-      weekly: 'Weekly Snippet',
-      monthly: 'Monthly Snippet',
-      yearly: 'Yearly Snippet'
-    };
-    return labels[type] || 'Daily Snippet';
-  };
 
   const formatDate = (dateStr) => {
     const d = new Date(dateStr);
@@ -187,83 +170,9 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
         </div>
         
         <div className="modal-body">
-          <div className="template-section">
-            <button 
-              className="template-toggle-btn"
-              onClick={() => setShowTemplates(!showTemplates)}
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-              </svg>
-              템플릿 불러오기
-              <svg className={`arrow-icon ${showTemplates ? 'open' : ''}`} viewBox="0 0 24 24" fill="currentColor">
-                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-              </svg>
-            </button>
-
-            {showTemplates && (
-              <div className="template-list">
-                {TEMPLATES.map((template) => (
-                  <button
-                    key={template.id}
-                    className="template-item"
-                    onClick={() => handleTemplateSelect(template)}
-                  >
-                    <div className="template-icon">
-                      <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-                      </svg>
-                    </div>
-                    <div className="template-info">
-                      <span className="template-name">{template.name}</span>
-                      <span className="template-preview">{template.title}</span>
-                    </div>
-                    <svg className="check-icon" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                    </svg>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="snippet-type">스니펫 유형</label>
-            <div className="snippet-type-selector">
-              <button
-                type="button"
-                className={`type-btn ${snippetType === 'daily' ? 'active' : ''}`}
-                onClick={() => setSnippetType('daily')}
-              >
-                Daily
-              </button>
-              <button
-                type="button"
-                className={`type-btn ${snippetType === 'weekly' ? 'active' : ''}`}
-                onClick={() => setSnippetType('weekly')}
-              >
-                Weekly
-              </button>
-              <button
-                type="button"
-                className={`type-btn ${snippetType === 'monthly' ? 'active' : ''}`}
-                onClick={() => setSnippetType('monthly')}
-              >
-                Monthly
-              </button>
-              <button
-                type="button"
-                className={`type-btn ${snippetType === 'yearly' ? 'active' : ''}`}
-                onClick={() => setSnippetType('yearly')}
-              >
-                Yearly
-              </button>
-            </div>
-          </div>
-
           <div className="form-group">
             <label htmlFor="snippet-content">
-              {getSnippetTypeLabel(snippetType)} 내용
+              Daily Snippet 내용
             </label>
             <textarea
               id="snippet-content"

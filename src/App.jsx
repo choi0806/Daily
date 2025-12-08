@@ -4,7 +4,6 @@ import Calendar from './components/Calendar';
 import TeamSnippetView from './components/TeamSnippetView';
 import SnippetModal from './components/SnippetModal';
 import ScheduleView from './components/ScheduleView';
-import TemplateEditor from './pages/TemplateEditor';
 import Login from './components/Login';
 import InitialSetup from './components/InitialSetup';
 import ChangePassword from './components/ChangePassword';
@@ -33,7 +32,7 @@ import {
 import './App.css';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'template', 'admin'
+  const [currentPage, setCurrentPage] = useState('home');
   
   // Firebase 인증 상태
   const [authUser, setAuthUser] = useState(null);
@@ -522,23 +521,7 @@ function App() {
     }
   };
 
-  const handleTemplateClick = () => {
-    setCurrentPage('template');
-  };
 
-  const handleBackToHome = () => {
-    setCurrentPage('home');
-  };
-
-  // 템플릿 편집 페이지 렌더링
-  if (currentPage === 'template') {
-    return (
-      <TemplateEditor 
-        user={currentUser}
-        onBack={handleBackToHome}
-      />
-    );
-  }
 
   // 로딩 중
   if (authLoading) {
@@ -585,7 +568,6 @@ function App() {
       <Header 
         user={currentUser}
         onLogout={handleLogout}
-        onTemplateClick={handleTemplateClick}
       />
       
       {/* 슈퍼 관리자인 경우 슈퍼 관리자 대시보드 표시 */}
@@ -658,11 +640,6 @@ function App() {
       {/* ScheduleModal was removed; modal is unavailable. */}
 
       {/* AIChatbot 및 AdminSettings 컴포넌트가 제거되어 관련 UI는 표시되지 않습니다. */}
-
-      {/* 템플릿 에디터 */}
-      {currentPage === 'template' && (
-        <TemplateEditor onClose={() => setCurrentPage('home')} />
-      )}
     </div>
   );
 }

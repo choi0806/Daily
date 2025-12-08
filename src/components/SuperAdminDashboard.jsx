@@ -8,10 +8,11 @@ function SuperAdminDashboard({ currentUser, userData, date }) {
   const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('snippets'); // 'snippets' or 'users'
+  const [selectedDate, setSelectedDate] = useState(date);
 
   useEffect(() => {
     loadAllData();
-  }, [date]);
+  }, [selectedDate]);
 
   const loadAllData = async () => {
     setLoading(true);
@@ -25,7 +26,7 @@ function SuperAdminDashboard({ currentUser, userData, date }) {
       const snippetsData = [];
       snippetsSnapshot.forEach((doc) => {
         const data = doc.data();
-        if (data.date === date) {
+        if (data.date === selectedDate) {
           snippetsData.push({ id: doc.id, ...data });
         }
       });
@@ -62,11 +63,9 @@ function SuperAdminDashboard({ currentUser, userData, date }) {
     return {
       total: allSnippets.length,
       byTeam: {
-        '개발팀': allSnippets.filter(s => s.userRole === '개발팀').length,
-        '기획팀': allSnippets.filter(s => s.userRole === '기획팀').length,
-        '디자인팀': allSnippets.filter(s => s.userRole === '디자인팀').length,
-        '마케팅팀': allSnippets.filter(s => s.userRole === '마케팅팀').length,
-        '데이터팀': allSnippets.filter(s => s.userRole === '데이터팀').length,
+        '피플파트너팀': allSnippets.filter(s => s.teamName === '피플파트너팀').length,
+        'HRBP팀': allSnippets.filter(s => s.teamName === 'HRBP팀').length,
+        '안전보건팀': allSnippets.filter(s => s.teamName === '안전보건팀').length,
       }
     };
   };
@@ -87,7 +86,16 @@ function SuperAdminDashboard({ currentUser, userData, date }) {
     <div className="super-admin-dashboard">
       <div className="dashboard-header">
         <h2>🔐 슈퍼 관리자 대시보드</h2>
-        <p className="dashboard-date">{date}</p>
+        <div className="date-selector">
+          <label htmlFor="date-picker">날짜 선택:</label>
+          <input
+            type="date"
+            id="date-picker"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="date-input"
+          />
+        </div>
       </div>
 
       {/* 통계 카드 */}

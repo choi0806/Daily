@@ -8,56 +8,107 @@ import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './config';
 
 // 사용자 조직 구조
-// ID 0: 슈퍼 관리자 (isSuperAdmin: true) - 모든 팀 관리
-// ID 1-5: 관리자 (isManager: true)
-// ID 6-14: 1번 관리자 팀 (개발팀)
-// ID 15-23: 2번 관리자 팀 (기획팀)
-// ID 24-32: 3번 관리자 팀 (디자인팀)
-// ID 33-41: 4번 관리자 팀 (마케팅팀)
-// ID 42-50: 5번 관리자 팀 (데이터팀)
+// 마스터 계정: m1(김종윤), m2(조상제), m3(김병국) - 전체 관리자
+// ID 1: 피플파트너팀 팀장
+// ID 2-11: 피플파트너팀 팀원 (10명)
+// ID 12: HRBP팀 팀장
+// ID 13-17: HRBP팀 팀원 (5명)
+// ID 18: 안전보건팀 팀장
+// ID 19-25: 안전보건팀 팀원 (7명)
 
 const TEAM_NAMES = {
-  1: '개발팀',
-  2: '기획팀',
-  3: '디자인팀',
-  4: '마케팅팀',
-  5: '데이터팀'
+  1: '피플파트너팀',
+  12: 'HRBP팀',
+  18: '안전보건팀'
+};
+
+const MASTER_ACCOUNTS = {
+  'm1': { name: '김종윤', role: '마스터 관리자' },
+  'm2': { name: '조상제', role: '마스터 관리자' },
+  'm3': { name: '김병국', role: '마스터 관리자' }
 };
 
 // 사용자 ID로 관리자 여부 및 팀 정보 계산
 export const getUserInfo = (userId) => {
-  const id = parseInt(userId);
-  
-  // 슈퍼 관리자 (ID 0)
-  if (id === 0) {
+  // 마스터 계정 처리 (m1, m2, m3)
+  if (typeof userId === 'string' && MASTER_ACCOUNTS[userId]) {
     return {
-      id: 0,
+      id: userId,
       isManager: true,
       isSuperAdmin: true,
       managerId: null,
       teamName: '전체 관리',
-      role: '슈퍼 관리자'
+      role: MASTER_ACCOUNTS[userId].role,
+      name: MASTER_ACCOUNTS[userId].name,
+      isMasterAccount: true
     };
   }
   
-  if (id >= 1 && id <= 5) {
+  const id = parseInt(userId);
+  
+  // 피플파트너팀 팀장 (ID 1)
+  if (id === 1) {
     return {
       id,
       isManager: true,
       managerId: null,
-      teamName: TEAM_NAMES[id],
-      role: `${TEAM_NAMES[id]} 관리자`
+      teamName: TEAM_NAMES[1],
+      role: `${TEAM_NAMES[1]} 팀장`
     };
   }
   
-  if (id >= 6 && id <= 50) {
-    const managerId = Math.floor((id - 6) / 9) + 1;
+  // 피플파트너팀 팀원 (ID 2-11)
+  if (id >= 2 && id <= 11) {
     return {
       id,
       isManager: false,
-      managerId,
-      teamName: TEAM_NAMES[managerId],
-      role: `${TEAM_NAMES[managerId]} 팀원`
+      managerId: 1,
+      teamName: TEAM_NAMES[1],
+      role: `${TEAM_NAMES[1]} 팀원`
+    };
+  }
+  
+  // HRBP팀 팀장 (ID 12)
+  if (id === 12) {
+    return {
+      id,
+      isManager: true,
+      managerId: null,
+      teamName: TEAM_NAMES[12],
+      role: `${TEAM_NAMES[12]} 팀장`
+    };
+  }
+  
+  // HRBP팀 팀원 (ID 13-17)
+  if (id >= 13 && id <= 17) {
+    return {
+      id,
+      isManager: false,
+      managerId: 12,
+      teamName: TEAM_NAMES[12],
+      role: `${TEAM_NAMES[12]} 팀원`
+    };
+  }
+  
+  // 안전보건팀 팀장 (ID 18)
+  if (id === 18) {
+    return {
+      id,
+      isManager: true,
+      managerId: null,
+      teamName: TEAM_NAMES[18],
+      role: `${TEAM_NAMES[18]} 팀장`
+    };
+  }
+  
+  // 안전보건팀 팀원 (ID 19-25)
+  if (id >= 19 && id <= 25) {
+    return {
+      id,
+      isManager: false,
+      managerId: 18,
+      teamName: TEAM_NAMES[18],
+      role: `${TEAM_NAMES[18]} 팀원`
     };
   }
   
@@ -67,18 +118,20 @@ export const getUserInfo = (userId) => {
 // 로그인
 export const loginUser = async (userId, password) => {
   try {
-    // 특별 처리: "master" 입력 시 ID 0으로 변환
-    let id;
-    if (userId === 'master') {
-      id = 0;
+    // 마스터 계정 처리 (m1, m2, m3)
+    let email;
+    let isMasterAccount = false;
+    
+    if (MASTER_ACCOUNTS[userId]) {
+      email = `${userId}@dailysnippet.com`;
+      isMasterAccount = true;
     } else {
-      id = parseInt(userId);
-      if (id < 1 || id > 50) {
-        return { success: false, error: '유효하지 않은 사용자 ID입니다. (0 또는 1-50)' };
+      const id = parseInt(userId);
+      if (id < 1 || id > 25) {
+        return { success: false, error: '유효하지 않은 사용자 ID입니다. (1-25 또는 마스터 계정)' };
       }
+      email = `user${id}@dailysnippet.com`;
     }
-
-    const email = `user${id}@dailysnippet.com`;
     
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -94,14 +147,15 @@ export const loginUser = async (userId, password) => {
         };
       } else {
         // 사용자 문서가 없으면 생성
-        const userInfo = getUserInfo(id);
+        const userInfo = getUserInfo(isMasterAccount ? userId : parseInt(userId));
+        
         const userData = {
-          id,
+          id: isMasterAccount ? userId : parseInt(userId),
           email,
-          name: `사용자${id}`,
+          name: isMasterAccount ? userInfo.name : `사용자${parseInt(userId)}`,
           ...userInfo,
           createdAt: new Date().toISOString(),
-          isInitialSetupComplete: false,
+          isInitialSetupComplete: isMasterAccount ? true : false,
           passwordChanged: false
         };
         
@@ -123,14 +177,15 @@ export const loginUser = async (userId, password) => {
         
         try {
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          const userInfo = getUserInfo(id);
+          const userInfo = getUserInfo(isMasterAccount ? userId : parseInt(userId));
+          
           const userData = {
-            id,
+            id: isMasterAccount ? userId : parseInt(userId),
             email,
-            name: `사용자${id}`,
+            name: isMasterAccount ? userInfo.name : `사용자${parseInt(userId)}`,
             ...userInfo,
             createdAt: new Date().toISOString(),
-            isInitialSetupComplete: false,
+            isInitialSetupComplete: isMasterAccount ? true : false,
             passwordChanged: false
           };
           
@@ -142,6 +197,46 @@ export const loginUser = async (userId, password) => {
             userData
           };
         } catch (createError) {
+          // 계정이 이미 존재하는 경우 로그인 시도
+          if (createError.code === 'auth/email-already-in-use') {
+            try {
+              const userCredential = await signInWithEmailAndPassword(auth, email, password);
+              
+              // Firestore에서 사용자 정보 가져오기
+              const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+              
+              if (userDoc.exists()) {
+                return { 
+                  success: true, 
+                  user: userCredential.user,
+                  userData: userDoc.data()
+                };
+              } else {
+                // 사용자 문서가 없으면 생성
+                const userInfo = getUserInfo(isMasterAccount ? userId : parseInt(userId));
+                
+                const userData = {
+                  id: isMasterAccount ? userId : parseInt(userId),
+                  email,
+                  name: isMasterAccount ? userInfo.name : `사용자${parseInt(userId)}`,
+                  ...userInfo,
+                  createdAt: new Date().toISOString(),
+                  isInitialSetupComplete: isMasterAccount ? true : false,
+                  passwordChanged: false
+                };
+                
+                await setDoc(doc(db, 'users', userCredential.user.uid), userData);
+                
+                return { 
+                  success: true, 
+                  user: userCredential.user,
+                  userData
+                };
+              }
+            } catch (loginError) {
+              return { success: false, error: '로그인 실패: ' + loginError.message };
+            }
+          }
           return { success: false, error: '계정 생성 실패: ' + createError.message };
         }
       }

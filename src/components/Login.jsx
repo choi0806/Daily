@@ -38,10 +38,10 @@ function Login() {
               id="userId"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
-              placeholder="1-50"
+              placeholder="1-25"
               required
             />
-            <span className="help-text">1-5: 관리자, 6-50: 팀원</span>
+            <span className="help-text">팀장: 1, 12, 18 | 팀원: 2-11, 13-17, 19-25</span>
           </div>
 
           <div className="form-group">
@@ -68,8 +68,9 @@ function Login() {
         </form>
 
         <div className="login-info">
-          <p>👤 관리자 ID: 1-5</p>
-          <p>👥 팀원 ID: 6-50</p>
+          <p>👤 피플파트너팀: 팀장(1), 팀원(2-11)</p>
+          <p>👥 HRBP팀: 팀장(12), 팀원(13-17)</p>
+          <p>🛡️ 안전보건팀: 팀장(18), 팀원(19-25)</p>
           <p>🔑 초기 비밀번호: 123456</p>
         </div>
       </div>

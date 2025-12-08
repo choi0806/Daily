@@ -1,7 +1,7 @@
 import React from 'react';
 import './Header.css';
 
-function Header({ user, onLogout, onTemplateClick }) {
+function Header({ user, onLogout }) {
   return (
     <header className="header">
       <div className="header-left">
@@ -15,13 +15,6 @@ function Header({ user, onLogout, onTemplateClick }) {
       </div>
       
       <div className="header-right">
-        <button className="template-btn" onClick={onTemplateClick}>
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h8v2H8v-2zm0-4h8v2H8v-2zm0-4h5v2H8V7z"/>
-          </svg>
-          템플릿
-        </button>
-        {/* 관리자 버튼 제거됨 */}
         <div className="user-info">
           <div className="user-avatar">
             <svg viewBox="0 0 24 24" fill="currentColor">

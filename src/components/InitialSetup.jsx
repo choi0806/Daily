@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { completeInitialSetup } from '../firebase/auth';
+import React, { useState, useEffect } from 'react';
+import { completeInitialSetup, getUserData } from '../firebase/auth';
 import './InitialSetup.css';
 
 function InitialSetup({ currentUser }) {
@@ -7,6 +7,20 @@ function InitialSetup({ currentUser }) {
   const [department, setDepartment] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // 사용자 정보를 가져와서 부서 자동 설정
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      const result = await getUserData(currentUser.uid);
+      if (result.success && result.data) {
+        // teamName이 있으면 부서로 설정
+        if (result.data.teamName) {
+          setDepartment(result.data.teamName);
+        }
+      }
+    };
+    loadUserInfo();
+  }, [currentUser.uid]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,10 +73,12 @@ function InitialSetup({ currentUser }) {
               type="text"
               id="department"
               value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              placeholder="부서를 입력하세요"
+              readOnly
+              placeholder="부서가 자동으로 설정됩니다"
               required
+              style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
             />
+            <span className="help-text">부서는 사용자 ID에 따라 자동으로 설정됩니다.</span>
           </div>
 
           {error && (

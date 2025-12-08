@@ -340,7 +340,39 @@
   font-weight: 500;
 }
 
-/* ?�???�션 */
+/* 팀장 피드백 표시 */
+.manager-feedback-display {
+  margin-top: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-left: 4px solid #4caf50;
+  border-radius: 8px;
+}
+
+.manager-feedback-display .feedback-header {
+  margin-bottom: 12px;
+}
+
+.manager-feedback-display .feedback-header strong {
+  font-size: 14px;
+  color: #2e7d32;
+}
+
+.manager-feedback-display .feedback-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1b5e20;
+  white-space: pre-wrap;
+}
+
+.manager-feedback-display .feedback-time {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #558b2f;
+  text-align: right;
+}
+
+/* 팀원 섹션 */
 .teammates-section {
   flex: 0 0 350px;
   padding: 24px;

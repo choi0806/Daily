@@ -101,6 +101,23 @@ function TeamSnippetView({ date, teamSnippets, currentUser, onClose, onWriteSnip
                       ))}
                     </div>
                   )}
+
+                  {/* 팀장 피드백 표시 - 본인 스니펫에만 표시 */}
+                  {displayedSnippet.managerFeedback && displayedSnippet.userId === currentUser.id && (
+                    <div className="manager-feedback-display">
+                      <div className="feedback-header">
+                        <strong>💬 팀장 피드백</strong>
+                      </div>
+                      <div className="feedback-content">
+                        {displayedSnippet.managerFeedback}
+                      </div>
+                      {displayedSnippet.feedbackUpdatedAt && (
+                        <div className="feedback-time">
+                          {new Date(displayedSnippet.feedbackUpdatedAt).toLocaleString('ko-KR')}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {selectedTeammate && (
