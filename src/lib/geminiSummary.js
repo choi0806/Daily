@@ -184,10 +184,31 @@ export const generateTeamSummary = async (snippets, teamName) => {
     });
     console.log('병합된 팀원 요약:', allMemberSummaries);
 
+    // 팀원별 요약이 없으면 기본 요약 반환
+    if (allMemberSummaries.length === 0) {
+      console.warn('팀원 요약이 없음. 기본 요약 반환');
+      return {
+        summary: `${teamName} 팀의 ${snippets.length}명이 스니펫을 작성했지만 요약을 생성할 수 없습니다.`,
+        projectProgress: {
+          status: '분석 불가',
+          completedTasks: [],
+          inProgressTasks: [],
+          blockers: []
+        },
+        keyInsights: ['요약 생성 중 오류가 발생했습니다.'],
+        highlights: [],
+        concerns: [],
+        topKeywords: uniqueKeywords.slice(0, 10),
+        recommendations: ['다시 시도해주세요.']
+      };
+    }
+
     // 팀원별 요약을 텍스트로 변환
     const memberSummariesText = allMemberSummaries.map(m => 
       `- ${m.name}: ${m.summary}\n  작업: ${m.keyTasks?.join(', ') || '없음'}\n  성과: ${m.achievements || '없음'}`
     ).join('\n\n');
+
+    console.log('최종 요약 프롬프트 준비 완료. 팀원 수:', allMemberSummaries.length);
 
     // 최종 요약 생성 (팀원별 상세 내용 포함)
     const finalSummaryPrompt = `${teamName} 팀의 ${snippets.length}명의 업무 내용을 종합하여 관리자용 보고서를 작성하세요.
@@ -233,13 +254,25 @@ JSON 형식으로 다음 구조로 작성:
     }
 
     const finalData = await finalResponse.json();
+    console.log('최종 API 응답:', finalData);
+    
+    if (!finalData.candidates?.[0]?.content?.parts?.[0]?.text) {
+      console.error('최종 응답 구조 오류:', finalData);
+      throw new Error('최종 응답 형식 오류');
+    }
+    
     let finalText = finalData.candidates[0].content.parts[0].text;
+    console.log('최종 원본 텍스트:', finalText);
     
     // ```json ... ``` 형태로 감싸진 경우 제거
-    finalText = finalText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+    finalText = finalText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
     console.log('최종 정리된 텍스트:', finalText);
     
     const finalJsonMatch = finalText.match(/\{[\s\S]*\}/);
+    
+    if (!finalJsonMatch) {
+      console.error('최종 JSON 매칭 실패. 원본 텍스트:', finalText);
+    }
     
     let finalSummary = {
       summary: `${teamName} 팀의 ${snippets.length}명이 작성했습니다.`,
@@ -249,13 +282,19 @@ JSON 형식으로 다음 구조로 작성:
     };
     
     if (finalJsonMatch) {
-      const parsed = JSON.parse(finalJsonMatch[0]);
-      finalSummary = {
-        summary: parsed.summary || finalSummary.summary,
-        keyInsights: parsed.keyInsights || [],
-        recommendations: parsed.recommendations || [],
-        teamProgress: parsed.teamProgress || finalSummary.teamProgress
-      };
+      try {
+        const parsed = JSON.parse(finalJsonMatch[0]);
+        console.log('최종 파싱 성공:', parsed);
+        finalSummary = {
+          summary: parsed.summary || finalSummary.summary,
+          keyInsights: parsed.keyInsights || [],
+          recommendations: parsed.recommendations || [],
+          teamProgress: parsed.teamProgress || finalSummary.teamProgress
+        };
+      } catch (parseError) {
+        console.error('최종 JSON 파싱 오류:', parseError);
+        console.error('파싱 시도한 텍스트:', finalJsonMatch[0]);
+      }
     }
     
     console.log('최종 결과:', finalSummary);
