@@ -514,21 +514,47 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
                     {aiSummary.projectProgress.inProgressTasks && aiSummary.projectProgress.inProgressTasks.length > 0 && (
                       <div className="task-list">
                         <strong>🔄 진행 중 ({aiSummary.projectProgress.inProgressTasks.length}개 작업)</strong>
-                        <details style={{marginTop: '8px'}}>
-                          <summary style={{cursor: 'pointer', color: '#667eea', fontWeight: '500', padding: '5px 0'}}>
-                            상세 내용 보기 ▼
-                          </summary>
-                          <ul style={{marginTop: '10px'}}>
-                            {aiSummary.projectProgress.inProgressTasks.slice(0, 10).map((task, idx) => (
-                              <li key={idx}>{task}</li>
-                            ))}
-                            {aiSummary.projectProgress.inProgressTasks.length > 10 && (
-                              <li style={{color: '#666', fontStyle: 'italic'}}>
-                                ...외 {aiSummary.projectProgress.inProgressTasks.length - 10}개 작업
-                              </li>
-                            )}
-                          </ul>
-                        </details>
+                        <div style={{marginTop: '15px'}}>
+                          {(() => {
+                            // 팀원별로 작업 그룹화
+                            const tasksByMember = {};
+                            aiSummary.projectProgress.inProgressTasks.forEach(task => {
+                              const colonIndex = task.indexOf(':');
+                              if (colonIndex > 0) {
+                                const memberName = task.substring(0, colonIndex).trim();
+                                const taskContent = task.substring(colonIndex + 1).trim();
+                                if (!tasksByMember[memberName]) {
+                                  tasksByMember[memberName] = [];
+                                }
+                                tasksByMember[memberName].push(taskContent);
+                              }
+                            });
+
+                            return Object.entries(tasksByMember).map(([member, tasks]) => (
+                              <div key={member} style={{
+                                marginBottom: '15px',
+                                padding: '12px',
+                                background: '#f8f9fa',
+                                borderRadius: '8px',
+                                borderLeft: '3px solid #667eea'
+                              }}>
+                                <div style={{
+                                  fontWeight: '600',
+                                  color: '#667eea',
+                                  marginBottom: '8px',
+                                  fontSize: '14px'
+                                }}>
+                                  👤 {member}
+                                </div>
+                                <ul style={{margin: 0, paddingLeft: '20px'}}>
+                                  {tasks.map((task, idx) => (
+                                    <li key={idx} style={{marginBottom: '4px', lineHeight: '1.5'}}>{task}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ));
+                          })()}
+                        </div>
                       </div>
                     )}
 
