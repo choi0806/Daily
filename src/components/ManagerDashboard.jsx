@@ -513,12 +513,22 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
 
                     {aiSummary.projectProgress.inProgressTasks && aiSummary.projectProgress.inProgressTasks.length > 0 && (
                       <div className="task-list">
-                        <strong>🔄 진행 중:</strong>
-                        <ul>
-                          {aiSummary.projectProgress.inProgressTasks.map((task, idx) => (
-                            <li key={idx}>{task}</li>
-                          ))}
-                        </ul>
+                        <strong>🔄 진행 중 ({aiSummary.projectProgress.inProgressTasks.length}개 작업)</strong>
+                        <details style={{marginTop: '8px'}}>
+                          <summary style={{cursor: 'pointer', color: '#667eea', fontWeight: '500', padding: '5px 0'}}>
+                            상세 내용 보기 ▼
+                          </summary>
+                          <ul style={{marginTop: '10px'}}>
+                            {aiSummary.projectProgress.inProgressTasks.slice(0, 10).map((task, idx) => (
+                              <li key={idx}>{task}</li>
+                            ))}
+                            {aiSummary.projectProgress.inProgressTasks.length > 10 && (
+                              <li style={{color: '#666', fontStyle: 'italic'}}>
+                                ...외 {aiSummary.projectProgress.inProgressTasks.length - 10}개 작업
+                              </li>
+                            )}
+                          </ul>
+                        </details>
                       </div>
                     )}
 
