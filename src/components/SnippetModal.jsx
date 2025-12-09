@@ -58,8 +58,23 @@ Tomorrow (내일 할 일)`
   }
 ];
 
+const DEFAULT_TEMPLATE = `What (무엇을 했나요?)
+
+
+Why (왜 했나요?)
+
+
+Highlight (잘한 점, 성과)
+
+
+Lowlight (아쉬운 점, 개선점)
+
+
+Tomorrow (내일 할 일)
+`;
+
 function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }) {
-  const [content, setContent] = useState(snippet?.content || '');
+  const [content, setContent] = useState(snippet?.content || DEFAULT_TEMPLATE);
   // 타임어택 관련 상태: 시간, 활성화, 그리고 타임업 시 입력 잠금
   const [timeLeft, setTimeLeft] = useState(300); // 5분 = 300초
   // 기존 스니펫 수정 시에는 타임어택 비활성화
@@ -67,7 +82,7 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
   const [isLocked, setIsLocked] = useState(false);
 
   useEffect(() => {
-    setContent(snippet?.content || '');
+    setContent(snippet?.content || DEFAULT_TEMPLATE);
     // 기존 스니펫을 수정하는 경우 타임어택 모드 해제 및 잠금 해제
     if (snippet) {
       setIsTimeAttack(false);
@@ -185,20 +200,6 @@ function SnippetModal({ date, snippet, onSave, onClose, timeAttackMode = false }
               className="snippet-textarea"
               value={content}
               onChange={(e) => { if (!isLocked) setContent(e.target.value); }}
-              placeholder="What (무엇을 했나요?)
-예: 새로운 기능 개발, 버그 수정, 회의 참석 등
-
-Why (왜 했나요?)
-예: 사용자 요청사항, 성능 개선 필요, 팀 협업을 위해 등
-
-Highlight (잘한 점, 성과)
-예: 예상보다 빠르게 완료, 좋은 피드백 받음, 새로운 기술 습득
-
-Lowlight (아쉬운 점, 개선점)
-예: 시간이 더 걸림, 예상치 못한 문제 발생, 더 나은 방법 고민 필요
-
-Tomorrow (내일 할 일)
-예: 리뷰 반영, 다음 단계 진행, 문서화 작업"
             />
           </div>
         </div>

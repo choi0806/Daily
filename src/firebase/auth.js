@@ -12,7 +12,7 @@ import { auth, db } from './config';
 // ID 1: 피플파트너팀 팀장
 // ID 2-11: 피플파트너팀 팀원 (10명)
 // ID 12: HRBP팀 팀장
-// ID 13-17: HRBP팀 팀원 (5명)
+// ID 13-17, 26-27: HRBP팀 팀원 (7명)
 // ID 18: 안전보건팀 팀장
 // ID 19-25: 안전보건팀 팀원 (7명)
 
@@ -79,8 +79,8 @@ export const getUserInfo = (userId) => {
     };
   }
   
-  // HRBP팀 팀원 (ID 13-17)
-  if (id >= 13 && id <= 17) {
+  // HRBP팀 팀원 (ID 13-17, 26-27)
+  if ((id >= 13 && id <= 17) || (id >= 26 && id <= 27)) {
     return {
       id,
       isManager: false,
@@ -127,8 +127,8 @@ export const loginUser = async (userId, password) => {
       isMasterAccount = true;
     } else {
       const id = parseInt(userId);
-      if (id < 1 || id > 25) {
-        return { success: false, error: '유효하지 않은 사용자 ID입니다. (1-25 또는 마스터 계정)' };
+      if (id < 1 || id > 27) {
+        return { success: false, error: '유효하지 않은 사용자 ID입니다. (1-27 또는 마스터 계정)' };
       }
       email = `user${id}@dailysnippet.com`;
     }
