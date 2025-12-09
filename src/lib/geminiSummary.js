@@ -56,7 +56,7 @@ ${snippetTexts}
           temperature: 0.7,
           topK: 40,
           topP: 0.95,
-          maxOutputTokens: 2048,
+          maxOutputTokens: 8192,
         }
       })
     });
@@ -241,10 +241,10 @@ JSON 형식으로 다음 구조로 작성:
       body: JSON.stringify({
         contents: [{ parts: [{ text: finalSummaryPrompt }] }],
         generationConfig: {
-          temperature: 0.5,
+          temperature: 0.7,
           topK: 40,
-          topP: 0.9,
-          maxOutputTokens: 2048,
+          topP: 0.95,
+          maxOutputTokens: 8192,
         }
       })
     });
@@ -323,9 +323,41 @@ JSON 형식으로 다음 구조로 작성:
       }
     });
     
+    // 팀원별 상세 요약을 HTML 형식으로 구성
+    const memberDetailsHtml = allMemberSummaries.map(member => {
+      return `
+<div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+  <h4 style="margin: 0 0 10px 0; color: #667eea; font-size: 16px;">👤 ${member.name}</h4>
+  <p style="margin: 5px 0; line-height: 1.6; color: #333;">${member.summary}</p>
+  <div style="margin-top: 10px;">
+    <strong style="color: #555;">주요 작업:</strong>
+    <ul style="margin: 5px 0; padding-left: 20px;">
+      ${member.keyTasks?.map(task => `<li>${task}</li>`).join('') || '<li>없음</li>'}
+    </ul>
+  </div>
+  ${member.achievements ? `<div style="margin-top: 8px;"><strong style="color: #555;">✨ 성과:</strong> ${member.achievements}</div>` : ''}
+  ${member.concerns ? `<div style="margin-top: 8px;"><strong style="color: #e74c3c;">⚠️ 우려사항:</strong> ${member.concerns}</div>` : ''}
+</div>`;
+    }).join('\n');
+
+    // 전체 요약을 하단에 추가
+    const fullSummary = `
+<div style="margin-bottom: 30px;">
+  <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">📋 팀원별 상세 업무 내용</h3>
+  ${memberDetailsHtml}
+</div>
+
+<div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white;">
+  <h3 style="margin: 0 0 15px 0; font-size: 18px;">📊 ${teamName} 팀 전체 요약</h3>
+  <p style="line-height: 1.8; margin: 10px 0; font-size: 15px;">${finalSummary.summary}</p>
+  <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.3);">
+    <strong>팀 진행 상황:</strong> ${finalSummary.teamProgress}
+  </div>
+</div>`;
+
     // 최종 반환 형식
     return {
-      summary: finalSummary.summary,
+      summary: fullSummary,
       projectProgress: {
         status: finalSummary.teamProgress,
         completedTasks: completedTasks,

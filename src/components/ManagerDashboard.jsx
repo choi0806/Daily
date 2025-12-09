@@ -487,9 +487,8 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
               </div>
             ) : (
               <div className="ai-summary-content">
-                <div className="summary-section">
-                  <h5>📊 전체 요약</h5>
-                  <p className="summary-text">{aiSummary.summary}</p>
+                <div className="summary-section" style={{marginBottom: '20px'}}>
+                  <div dangerouslySetInnerHTML={{ __html: aiSummary.summary }} />
                 </div>
 
                 {aiSummary.projectProgress && (
