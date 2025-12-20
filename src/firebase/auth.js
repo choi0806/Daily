@@ -15,11 +15,14 @@ import { auth, db } from './config';
 // ID 13-17, 26-27: HRBP팀 팀원 (7명)
 // ID 18: 안전보건팀 팀장
 // ID 19-25: 안전보건팀 팀원 (7명)
+// ID 28: 사업관리팀 팀장 (안효욱)
+// ID 29-36: 사업관리팀 팀원 (8명: 류대균, 송경수, 정용복, 박진호, 강유리, 한철희, 하인구, 김희수)
 
 const TEAM_NAMES = {
   1: '피플파트너팀',
   12: 'HRBP팀',
-  18: '안전보건팀'
+  18: '안전보건팀',
+  28: '사업관리팀'
 };
 
 const MASTER_ACCOUNTS = {
@@ -112,6 +115,28 @@ export const getUserInfo = (userId) => {
     };
   }
   
+  // 사업관리팀 팀장 (ID 28)
+  if (id === 28) {
+    return {
+      id,
+      isManager: true,
+      managerId: null,
+      teamName: TEAM_NAMES[28],
+      role: `${TEAM_NAMES[28]} 팀장`
+    };
+  }
+  
+  // 사업관리팀 팀원 (ID 29-36)
+  if (id >= 29 && id <= 36) {
+    return {
+      id,
+      isManager: false,
+      managerId: 28,
+      teamName: TEAM_NAMES[28],
+      role: `${TEAM_NAMES[28]} 팀원`
+    };
+  }
+  
   return null;
 };
 
@@ -127,8 +152,8 @@ export const loginUser = async (userId, password) => {
       isMasterAccount = true;
     } else {
       const id = parseInt(userId);
-      if (id < 1 || id > 27) {
-        return { success: false, error: '유효하지 않은 사용자 ID입니다. (1-27 또는 마스터 계정)' };
+      if (id < 1 || id > 36) {
+        return { success: false, error: '유효하지 않은 사용자 ID입니다. (1-36 또는 마스터 계정)' };
       }
       email = `user${id}@dailysnippet.com`;
     }
