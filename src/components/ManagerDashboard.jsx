@@ -82,11 +82,19 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
       if (viewMode === 'daily') {
         startDate = endDate = selectedDate;
         // 일간 모드: 정확한 날짜 매칭 (인덱스 불필요)
-        const snippetsQuery = query(
-          collection(db, 'snippets'),
-          where('managerId', '==', currentUser.id),
-          where('date', '==', selectedDate)
-        );
+        // 사업관리팀(28, 37)은 같은 팀원을 관리
+        const isBusinessTeam = currentUser.id === 28 || currentUser.id === 37;
+        const snippetsQuery = isBusinessTeam
+          ? query(
+              collection(db, 'snippets'),
+              where('managerId', 'in', [28, 37]),
+              where('date', '==', selectedDate)
+            )
+          : query(
+              collection(db, 'snippets'),
+              where('managerId', '==', currentUser.id),
+              where('date', '==', selectedDate)
+            );
         
         const snapshot = await getDocs(snippetsQuery);
         const snippetsData = [];
@@ -119,15 +127,27 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
 
       console.log('스니펫 로드:', { viewMode, startDate, endDate, managerId: currentUser.id });
 
-      const snippetsQuery = query(
-        collection(db, 'snippets'),
-        where('managerId', '==', currentUser.id),
-        where('date', '>=', startDate),
-        where('date', '<=', endDate)
-        // 인덱스 생성 완료 후 아래 주석 해제
-        // orderBy('date', 'desc'),
-        // orderBy('timestamp', 'desc')
-      );
+      // 사업관리팀(28, 37)은 같은 팀원을 관리
+      const isBusinessTeam = currentUser.id === 28 || currentUser.id === 37;
+      const snippetsQuery = isBusinessTeam
+        ? query(
+            collection(db, 'snippets'),
+            where('managerId', 'in', [28, 37]),
+            where('date', '>=', startDate),
+            where('date', '<=', endDate)
+            // 인덱스 생성 완료 후 아래 주석 해제
+            // orderBy('date', 'desc'),
+            // orderBy('timestamp', 'desc')
+          )
+        : query(
+            collection(db, 'snippets'),
+            where('managerId', '==', currentUser.id),
+            where('date', '>=', startDate),
+            where('date', '<=', endDate)
+            // 인덱스 생성 완료 후 아래 주석 해제
+            // orderBy('date', 'desc'),
+            // orderBy('timestamp', 'desc')
+          );
 
       const snapshot = await getDocs(snippetsQuery);
       const snippetsData = [];
