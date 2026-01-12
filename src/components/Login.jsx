@@ -38,10 +38,10 @@ function Login() {
               id="userId"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
-              placeholder="1-37"
+              placeholder="1-39"
               required
             />
-            <span className="help-text">팀장: 1, 12, 18, 28, 37 | 팀원: 2-11, 13-17, 19-25, 26-27, 29-36 </span>
+            <span className="help-text">팀장: 1, 12, 18, 28, 37 | 팀원: 2-11, 13-17, 19-25, 26-27, 29-36, 38-39 </span>
           </div>
 
           <div className="form-group">
@@ -68,10 +68,10 @@ function Login() {
         </form>
 
         <div className="login-info">
-          <p>👤 피플파트너팀: 팀장(1), 팀원(2-11)</p>
+          <p>👤 피플파트너팀: 팀장(1), 팀원(2-11, 38)</p>
           <p>👥 HRBP팀: 팀장(12), 팀원(13-17, 26-27)</p>
           <p>🛡️ 안전보건팀: 팀장(18), 팀원(19-25)</p>
-          <p>📊 사업관리팀: 팀장(28,37), 팀원(29-36)</p>
+          <p>📊 사업관리팀: 팀장(28,37), 팀원(29-36, 39)</p>
           <p>🔑 초기 비밀번호: 123456</p>
         </div>
       </div>

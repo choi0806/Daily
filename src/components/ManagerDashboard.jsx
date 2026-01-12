@@ -197,14 +197,16 @@ function ManagerDashboard({ currentUser, userData, date, teamSnippets = [] }) {
     if (!snippetsToAnalyze || snippetsToAnalyze.length === 0) return;
 
     // 팀원 수 계산 (관리자 ID에 따라 다름)
-    let totalMembers = 10; // 기본값 (피플파트너팀)
+    let totalMembers = 11; // 기본값 (피플파트너팀: 2-11, 38)
     if (currentUser.id === 12) {
-      totalMembers = 5; // HRBP팀
+      totalMembers = 7; // HRBP팀: 13-17, 26-27
     } else if (currentUser.id === 18) {
-      totalMembers = 7; // 안전보건팀
+      totalMembers = 7; // 안전보건팀: 19-25
+    } else if (currentUser.id === 28 || currentUser.id === 37) {
+      totalMembers = 9; // 사업관리팀: 29-36, 39
     } else if (currentUser.isSuperAdmin || currentUser.isMasterAccount) {
       // 마스터 계정은 전체 팀원 수
-      totalMembers = 22; // 10 + 5 + 7
+      totalMembers = 34; // 11 + 7 + 7 + 9
     }
 
     // 기간별로 고유 사용자 수 계산

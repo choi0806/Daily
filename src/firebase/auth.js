@@ -18,6 +18,8 @@ import { auth, db } from './config';
 // ID 28: 사업관리팀 팀장 (안효욱)
 // ID 29-36: 사업관리팀 팀원 (8명: 류대균, 송경수, 정용복, 박진호, 강유리, 한철희, 하인구, 김희수)
 // ID 37: 사업관리팀 담당임원 (이강인) - 사업관리팀 스니펫 확인 및 피드백 작성 가능
+// ID 38: 피플파트너팀 팀원 (나진수)
+// ID 39: 사업관리팀 팀원 (최유림)
 
 const TEAM_NAMES = {
   1: '피플파트너팀',
@@ -61,8 +63,8 @@ export const getUserInfo = (userId) => {
     };
   }
   
-  // 피플파트너팀 팀원 (ID 2-11)
-  if (id >= 2 && id <= 11) {
+  // 피플파트너팀 팀원 (ID 2-11, 38)
+  if ((id >= 2 && id <= 11) || id === 38) {
     return {
       id,
       isManager: false,
@@ -127,8 +129,8 @@ export const getUserInfo = (userId) => {
     };
   }
   
-  // 사업관리팀 팀원 (ID 29-36)
-  if (id >= 29 && id <= 36) {
+  // 사업관리팀 팀원 (ID 29-36, 39)
+  if ((id >= 29 && id <= 36) || id === 39) {
     return {
       id,
       isManager: false,
@@ -164,8 +166,8 @@ export const loginUser = async (userId, password) => {
       isMasterAccount = true;
     } else {
       const id = parseInt(userId);
-      if (id < 1 || id > 37) {
-        return { success: false, error: '유효하지 않은 사용자 ID입니다. (1-37 또는 마스터 계정)' };
+      if (id < 1 || id > 39) {
+        return { success: false, error: '유효하지 않은 사용자 ID입니다. (1-39 또는 마스터 계정)' };
       }
       email = `user${id}@dailysnippet.com`;
     }
